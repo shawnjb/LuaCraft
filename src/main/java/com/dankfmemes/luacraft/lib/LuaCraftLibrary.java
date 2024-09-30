@@ -26,6 +26,33 @@ public class LuaCraftLibrary {
     public void registerFunctions(Globals globals) {
         LuaValue table = LuaValue.tableOf();
 
+        table.set("getPlayer", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                String playerName = args.checkjstring(1);
+                Player targetPlayer = Bukkit.getPlayer(playerName);
+                if (targetPlayer != null) {
+                    return new LuaCraftPlayer(targetPlayer).toLuaValue(); // Convert to LuaValue
+                }
+                return LuaValue.NIL;
+            }
+        });
+
+        table.set("getPlayers", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                LuaValue playersTable = LuaValue.tableOf();
+                int index = 1;
+
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    LuaCraftPlayer luaCraftPlayer = new LuaCraftPlayer(onlinePlayer);
+                    playersTable.set(index++, luaCraftPlayer.toLuaValue()); // Add player to Lua table
+                }
+
+                return playersTable;
+            }
+        });
+
         table.set("print", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
@@ -33,9 +60,33 @@ public class LuaCraftLibrary {
                 for (int i = 1; i <= args.narg(); i++) {
                     message.append(args.checkjstring(i)).append(" ");
                 }
-                Component chatMessage = plugin.translateColorCodes(message.toString().trim());
-                if (plugin.getLastSender() != null) {
-                    plugin.getLastSender().sendMessage(chatMessage);
+                String[] messages = message.toString().trim().split("\\\\n");
+                for (String msg : messages) {
+                    Component chatMessage = plugin.translateColorCodes(msg.trim());
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        player.sendMessage(chatMessage);
+                    }
+                }
+                return LuaValue.NIL;
+            }
+        });
+
+        table.set("broadcast", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                StringBuilder message = new StringBuilder();
+                for (int i = 1; i <= args.narg(); i++) {
+                    message.append(args.checkjstring(i)).append(" ");
+                }
+                String fullMessage = message.toString().trim();
+                String[] messages = fullMessage.split("\\\\n");
+                Bukkit.getLogger().info("[LuaCraft Broadcast] " + fullMessage);
+
+                for (String msg : messages) {
+                    Component chatMessage = plugin.translateColorCodes(msg.trim());
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        player.sendMessage(chatMessage);
+                    }
                 }
                 return LuaValue.NIL;
             }

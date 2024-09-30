@@ -13,21 +13,46 @@ import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
 
+/**
+ * Represents a LuaCraft entity in the Minecraft world, providing various
+ * methods to interact with and manipulate the entity's attributes.
+ */
 public class LuaCraftEntity {
     private Entity entity;
 
+    /**
+     * Constructs a LuaCraftEntity with a given Entity instance.
+     * 
+     * @param entity The Bukkit Entity to wrap.
+     */
     public LuaCraftEntity(Entity entity) {
         this.entity = entity;
     }
 
+    /**
+     * Constructs a LuaCraftEntity using an entity's UUID as a string.
+     * 
+     * @param entityUUID The UUID of the entity as a String.
+     */
     public LuaCraftEntity(String entityUUID) {
         this.entity = getEntityByUUID(entityUUID);
     }
 
+    /**
+     * Constructs a LuaCraftEntity using an entity's UUID as a UUID object.
+     * 
+     * @param entityUUID The UUID of the entity as a UUID object.
+     */
     public LuaCraftEntity(UUID entityUUID) {
         this.entity = getEntityByUUID(entityUUID.toString());
     }
 
+    /**
+     * Returns the entity's data as a JSON object, including its UUID, type,
+     * and position.
+     * 
+     * @return A JSONObject containing the entity's information.
+     */
     public JSONObject getEntityDataAsJson() {
         JSONObject entityInfo = new JSONObject();
         entityInfo.put("id", entity.getUniqueId().toString());
@@ -43,7 +68,12 @@ public class LuaCraftEntity {
         return entityInfo;
     }
 
-    // Fetch entity by UUID (Utility method)
+    /**
+     * Retrieves an Entity by its UUID string.
+     * 
+     * @param uuid The UUID of the entity as a String.
+     * @return The Entity with the specified UUID, or null if not found.
+     */
     public Entity getEntityByUUID(String uuid) {
         try {
             UUID entityUUID = UUID.fromString(uuid);
@@ -55,31 +85,49 @@ public class LuaCraftEntity {
                 }
             }
         } catch (IllegalArgumentException e) {
-            // Handle invalid UUID format
+            Bukkit.getLogger().warning("Invalid UUID format: " + uuid);
         }
         return null;
     }
 
-    // Method to check if the entity is valid
+    /**
+     * Checks if the entity is valid (i.e., not null).
+     * 
+     * @return True if the entity is valid, otherwise false.
+     */
     public boolean isValid() {
         return entity != null;
     }
 
-    // Set the custom name of the entity
+    /**
+     * Sets a custom name for the entity.
+     * 
+     * @param name The custom name to set.
+     */
     public void setCustomName(String name) {
         if (entity != null) {
             entity.customName(Component.text(name));
         }
     }
 
-    // Set the health of the entity (if it's a LivingEntity)
+    /**
+     * Sets the health of the entity if it is a LivingEntity.
+     * 
+     * @param health The health value to set.
+     */
     public void setHealth(double health) {
         if (entity instanceof LivingEntity) {
             ((LivingEntity) entity).setHealth(health);
         }
     }
 
-    // Teleport entity to a new position
+    /**
+     * Teleports the entity to a specified position.
+     * 
+     * @param x The x-coordinate to teleport to.
+     * @param y The y-coordinate to teleport to.
+     * @param z The z-coordinate to teleport to.
+     */
     public void teleport(double x, double y, double z) {
         if (entity != null) {
             Location newLocation = new Location(entity.getWorld(), x, y, z);
@@ -87,7 +135,11 @@ public class LuaCraftEntity {
         }
     }
 
-    // Set whether the entity is a baby (for Ageable entities)
+    /**
+     * Sets whether the entity is a baby (if it is an Ageable entity).
+     * 
+     * @param isBaby True to set the entity as a baby, false to set it as an adult.
+     */
     public void setBaby(boolean isBaby) {
         if (entity instanceof Ageable) {
             Ageable ageable = (Ageable) entity;
@@ -99,14 +151,22 @@ public class LuaCraftEntity {
         }
     }
 
-    // Set whether a Creeper is charged
+    /**
+     * Sets whether a Creeper is charged.
+     * 
+     * @param charged True to charge the Creeper, false to discharge it.
+     */
     public void setCharged(boolean charged) {
         if (entity instanceof Creeper) {
             ((Creeper) entity).setPowered(charged);
         }
     }
 
-    // Get the entity's UUID as a string
+    /**
+     * Returns the entity's UUID as a String.
+     * 
+     * @return The UUID of the entity, or null if the entity is not valid.
+     */
     public String getUUID() {
         if (entity != null) {
             return entity.getUniqueId().toString();
@@ -114,7 +174,11 @@ public class LuaCraftEntity {
         return null;
     }
 
-    // Lua interface for accessing entity's custom name
+    /**
+     * Retrieves the custom name of the entity as a LuaValue.
+     * 
+     * @return The custom name as a LuaValue, or LuaValue.NIL if not set.
+     */
     public LuaValue getCustomName() {
         if (entity != null && entity.customName() != null) {
             return LuaValue.valueOf(entity.customName().toString());
@@ -122,5 +186,14 @@ public class LuaCraftEntity {
         return LuaValue.NIL;
     }
 
-    // Add more methods as needed for additional properties
+    /**
+     * Enables or disables the AI for the entity if it is a LivingEntity.
+     * 
+     * @param enabled True to enable AI, false to disable it.
+     */
+    public void setAI(boolean enabled) {
+        if (entity instanceof LivingEntity) {
+            ((LivingEntity) entity).setAI(enabled);
+        }
+    }
 }

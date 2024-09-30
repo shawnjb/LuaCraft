@@ -114,3 +114,12 @@ function luacraft.getAllEntities() end
 --- luacraft.modifyEntityData("entity-uuid", mods)
 --- ```
 function luacraft.modifyEntityData(entityUUID, modifications) end
+
+--- Logs a message to the server console.
+--- @vararg string The message to log.
+--- This function takes a single string argument and logs it to the 
+--- Bukkit server console with the prefix "[LuaCraft]".
+--- ```lua
+--- luacraft.consoleMessage("This is a log message.")
+--- ```
+function luacraft.consoleMessage(...) end

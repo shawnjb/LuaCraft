@@ -3,6 +3,64 @@
 --- @class LuaCraft
 luacraft = {}
 
+--- @class LuaCraftPlayer
+--- Represents a player in the game.
+--- Contains methods to interact with the player.
+local LuaCraftPlayer = {
+    --- Sends a message to the player.
+    --- @param message string The message to send.
+    --- ```lua
+    --- player:sendMessage("Hello, Player!")
+    --- ```
+    sendMessage = function(message) end,
+
+    --- Retrieves the player's position as a table.
+    --- @return { x: number, y: number, z: number }
+    --- ```lua
+    --- local position = player:getPosition()
+    --- print(position.x, position.y, position.z)
+    --- ```
+    getPosition = function() end,
+
+    --- Teleports the player to the specified coordinates.
+    --- @param x number The X coordinate.
+    --- @param y number The Y coordinate.
+    --- @param z number The Z coordinate.
+    --- ```lua
+    --- player:teleport(100, 64, 100)
+    --- ```
+    teleport = function(x, y, z) end,
+
+    --- Retrieves the player's name.
+    --- @return string @The name of the player.
+    --- ```lua
+    --- local name = player:getName()
+    --- ```
+    getName = function() end,
+
+    --- Checks if the player is online.
+    --- @return boolean @True if the player is online, false otherwise.
+    --- ```lua
+    --- local online = player:isOnline()
+    --- ```
+    isOnline = function() end,
+
+    --- Gives an item to the player.
+    --- @param itemName string The name of the item to give.
+    --- @param amount number The quantity of the item.
+    --- ```lua
+    --- player:giveItem("DIAMOND", 5)
+    --- ```
+    giveItem = function(itemName, amount) end,
+
+    --- Runs a command as the player.
+    --- @param command string The command to execute.
+    --- ```lua
+    --- player:runCommand("/give @p diamond 1")
+    --- ```
+    runCommand = function(command) end
+}
+
 --- Prints messages to the last command sender's chat.
 --- @vararg ... The messages to be printed.
 --- ```lua
@@ -68,6 +126,13 @@ function luacraft.setPlayerPosition(x, y, z) end
 --- ```
 function luacraft.getPlayerPosition() end
 
+--- Retrieves the executing player as a LuaCraftPlayer object.
+--- @return LuaCraftPlayer @The player object.
+--- ```lua
+--- local player = luacraft.getLocalPlayer()
+--- ```
+function luacraft.getLocalPlayer() end
+
 --- Summons an entity at the specified coordinates.
 --- The entity is identified by its Enum name.
 --- @param entityName string The name of the entity (as a string) to summon (e.g., "CREEPER", "ZOMBIE").
@@ -117,7 +182,7 @@ function luacraft.modifyEntityData(entityUUID, modifications) end
 
 --- Logs a message to the server console.
 --- @vararg string The message to log.
---- This function takes a single string argument and logs it to the 
+--- This function takes a single string argument and logs it to the
 --- Bukkit server console with the prefix "[LuaCraft]".
 --- ```lua
 --- luacraft.consoleMessage("This is a log message.")

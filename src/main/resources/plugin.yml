@@ -3,9 +3,20 @@ version: 1.0
 api-version: 1.21
 main: com.dankfmemes.luacraft.LuaCraft
 commands:
-  runscript:
-    description: Run a Lua script
+  loadscript:
+    description: Load and execute a Lua script from the lua-notlive directory
+    usage: /<command> <filename>
+    permissions:
+      luacraft.loadscript:
+        description: Allows execution of Lua scripts by loading them from lua-notlive
+  listscripts:
+    description: List all available Lua scripts in the lua-notlive directory
     usage: /<command>
+    permissions:
+      luacraft.listscripts:
+        description: Allows viewing of available Lua scripts
 permissions:
-  luacraft.runscript:
-    description: Allows execution of Lua scripts
+  luacraft.loadscript:
+    description: Allows execution of Lua scripts by loading them from lua-notlive
+  luacraft.listscripts:
+    description: Allows viewing of available Lua scripts

@@ -2,14 +2,10 @@ package com.dankfmemes.luacraft.lib;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Ageable;
-import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.Globals;
@@ -17,7 +13,6 @@ import org.luaj.vm2.LuaValue;
 
 import com.dankfmemes.luacraft.LuaCraft;
 import com.dankfmemes.luacraft.utils.Vec3;
-import com.dankfmemes.luacraft.utils.Entities;
 
 import net.kyori.adventure.text.Component;
 
@@ -178,17 +173,8 @@ public class LuaCraftLibrary {
                 if (plugin.getLastSender() instanceof Player) {
                     Player player = (Player) plugin.getLastSender();
                     for (Entity entity : player.getWorld().getEntities()) {
-                        JSONObject entityInfo = new JSONObject();
-                        entityInfo.put("id", entity.getUniqueId().toString());
-                        entityInfo.put("type", entity.getType().toString());
-                        entityInfo.put("position", new JSONObject() {
-                            {
-                                put("x", entity.getLocation().getX());
-                                put("y", entity.getLocation().getY());
-                                put("z", entity.getLocation().getZ());
-                            }
-                        });
-                        entityArray.add(entityInfo);
+                        LuaCraftEntity luaCraftEntity = new LuaCraftEntity(entity);
+                        entityArray.add(luaCraftEntity.getEntityDataAsJson());
                     }
                     return LuaValue.valueOf(entityArray.toJSONString());
                 } else {
@@ -203,13 +189,14 @@ public class LuaCraftLibrary {
         table.set("modifyEntityData", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
+                // Ensure we have a UUID and a data table
                 if (args.isstring(1) && args.istable(2)) {
-                    String entityUUID = args.checkjstring(1); // Get UUID as a string
+                    String entityUUID = args.checkjstring(1);
                     LuaValue dataTable = args.checktable(2);
 
-                    // Retrieve the entity using the UUID
-                    Entity entity = Entities.getEntityByUUID(entityUUID);
-                    if (entity == null) {
+                    // Use LuaCraftEntity to manage the entity
+                    LuaCraftEntity luaCraftEntity = new LuaCraftEntity(entityUUID);
+                    if (!luaCraftEntity.isValid()) {
                         plugin.getLastSender().sendMessage("Entity with the given UUID not found.");
                         return LuaValue.NIL;
                     }
@@ -217,13 +204,13 @@ public class LuaCraftLibrary {
                     // Modify custom name
                     LuaValue customName = dataTable.get("customName");
                     if (!customName.isnil()) {
-                        entity.customName(Component.text(customName.tojstring()));
+                        luaCraftEntity.setCustomName(customName.tojstring());
                     }
 
                     // Modify health
                     LuaValue health = dataTable.get("health");
-                    if (!health.isnil() && entity instanceof LivingEntity) {
-                        ((LivingEntity) entity).setHealth(health.todouble());
+                    if (!health.isnil()) {
+                        luaCraftEntity.setHealth(health.todouble());
                     }
 
                     // Modify position
@@ -232,30 +219,32 @@ public class LuaCraftLibrary {
                         double x = position.get("x").todouble();
                         double y = position.get("y").todouble();
                         double z = position.get("z").todouble();
-                        Location newLocation = new Location(entity.getWorld(), x, y, z);
-                        entity.teleport(newLocation);
+                        luaCraftEntity.teleport(x, y, z);
                     }
 
                     // Modify charged state (for Creepers)
-                    if (entity instanceof Creeper) {
-                        LuaValue charged = dataTable.get("charged");
-                        if (!charged.isnil()) {
-                            ((Creeper) entity).setPowered(charged.toboolean());
-                        }
+                    LuaValue charged = dataTable.get("charged");
+                    if (!charged.isnil()) {
+                        luaCraftEntity.setCharged(charged.toboolean());
                     }
 
                     // Modify isBaby state (for Ageable entities)
                     LuaValue isBaby = dataTable.get("isBaby");
-                    if (!isBaby.isnil() && entity instanceof Ageable) {
-                        if (isBaby.toboolean()) {
-                            ((Ageable) entity).setBaby();
-                        } else {
-                            ((Ageable) entity).setAdult();
-                        }
+                    if (!isBaby.isnil()) {
+                        luaCraftEntity.setBaby(isBaby.toboolean());
                     }
                 } else {
                     plugin.getLastSender().sendMessage("You must provide a valid entity UUID and a Lua table.");
                 }
+                return LuaValue.NIL;
+            }
+        });
+
+        table.set("consoleMessage", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                String message = args.checkjstring(1);
+                Bukkit.getLogger().info("[LuaCraft] " + message);
                 return LuaValue.NIL;
             }
         });

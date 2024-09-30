@@ -14,6 +14,7 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 
 import com.dankfmemes.luacraft.lib.LuaCraftLibrary;
 import com.dankfmemes.luacraft.utils.Undumper;
+import com.dankfmemes.luacraft.utils.Vec3;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -81,7 +82,9 @@ public class LuaCraft extends JavaPlugin {
             getLogger().severe("Lua error while loading init.lua: " + e.getMessage());
         }
 
-        luaCraftLibrary.registerFunctions(globals); // Register LuaCraftLibrary functions
+        luaCraftLibrary.registerFunctions(globals);
+        Vec3.registerVec3(globals);
+        globals.get("print").call(LuaValue.valueOf("Vec3 module registered."));
     }
 
     private void loadConfig() {

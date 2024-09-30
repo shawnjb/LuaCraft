@@ -52,13 +52,7 @@ public class LuaCraftPlayer {
     };
 
     public void giveItem(String itemName, int amount) {
-        Material material;
-        if (itemName.startsWith("minecraft:")) {
-            material = Material.getMaterial(itemName.toUpperCase().split(":")[1]);
-        } else {
-            material = Material.getMaterial(itemName.toUpperCase());
-        }
-
+        Material material = Material.getMaterial(itemName.toUpperCase());
         if (material != null) {
             ItemStack itemStack = new ItemStack(material, amount);
             player.getInventory().addItem(itemStack);
@@ -74,6 +68,16 @@ public class LuaCraftPlayer {
 
     public LuaValue toLuaValue() {
         LuaValue playerTable = LuaValue.tableOf();
+        
+        playerTable.set("giveItem", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                String itemName = args.checkjstring(1);
+                int amount = args.checkint(2);
+                giveItem(itemName, amount);
+                return LuaValue.NIL;
+            }
+        });
 
         playerTable.set("sendMessage", new VarArgFunction() {
             @Override

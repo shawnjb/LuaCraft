@@ -5,7 +5,7 @@
 
 maven.buildMavenPackage rec {
   pname = "luacraft";
-  version = "1.0";
+  version = "1.1";
 
   src = ./.;
   mvnHash = "sha256-u7y6YhTnvKUJT5JgkrFShqdvDjA5DtsSuR0OWmCjsNE=";

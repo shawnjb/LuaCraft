@@ -1,4 +1,4 @@
-package org.dankfmemes.luacraft.utils;
+package com.dankfmemes.luacraft.utils;
 
 import org.luaj.vm2.Varargs;
 

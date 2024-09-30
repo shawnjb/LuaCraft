@@ -1,4 +1,4 @@
-package org.dankfmemes.luacraft.Undumper;
+package com.dankfmemes.luacraft.utils;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.Prototype;
@@ -6,10 +6,10 @@ import org.luaj.vm2.Prototype;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class LuaCraftUndumper implements Globals.Undumper {
+public class Undumper implements Globals.Undumper {
     private Globals globals = null;
 
-    public LuaCraftUndumper(Globals globals) {
+    public Undumper(Globals globals) {
         this.globals = globals;
     }
 

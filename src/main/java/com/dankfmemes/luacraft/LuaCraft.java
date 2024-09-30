@@ -1,24 +1,23 @@
-package org.dankfmemes.luacraft;
+package com.dankfmemes.luacraft;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.dankfmemes.luacraft.Undumper.LuaCraftUndumper;
-import org.dankfmemes.luacraft.utils.EntityUtils;
-import org.dankfmemes.luacraft.utils.Vec3;
 import org.luaj.vm2.*;
 import org.luaj.vm2.lib.VarArgFunction;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
+
+import com.dankfmemes.luacraft.utils.Undumper;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LuaCraft extends JavaPlugin implements TabExecutor {
+public class LuaCraft extends JavaPlugin {
     public CommandSender lastSender;
     private Globals globals;
 
@@ -27,7 +26,7 @@ public class LuaCraft extends JavaPlugin implements TabExecutor {
         super.onEnable();
 
         this.globals = JsePlatform.standardGlobals();
-        this.globals.undumper = new LuaCraftUndumper(this.globals);
+        this.globals.undumper = new Undumper(this.globals);
 
         File luaDir = new File(getDataFolder(), "lua");
         if (!luaDir.exists()) {
@@ -66,26 +65,6 @@ public class LuaCraft extends JavaPlugin implements TabExecutor {
         registerNativeFunctions();
     }
 
-    private void createInitLuaFile() {
-        File initLuaFile = new File(getServer().getWorldContainer().getParentFile(), "init.lua");
-
-        if (!initLuaFile.exists()) {
-            try {
-                if (initLuaFile.createNewFile()) {
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(initLuaFile))) {
-                        writer.write("-- Default init.lua for LuaCraft");
-                        writer.newLine();
-                        writer.write("-- Add your initialization code here");
-                        writer.newLine();
-                    }
-                    getLogger().info("Created init.lua file at " + initLuaFile.getAbsolutePath());
-                }
-            } catch (IOException e) {
-                getLogger().severe("Could not create init.lua file: " + e.getMessage());
-            }
-        }
-    }
-
     @Override
     public void onDisable() {
         super.onDisable();
@@ -108,6 +87,15 @@ public class LuaCraft extends JavaPlugin implements TabExecutor {
             }
         });
 
+        globals.set("colorize", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                String color = args.checkjstring(1);
+                String text = args.checkjstring(2);
+                return CoerceJavaToLua.coerce("&" + color + text);
+            }
+        });
+
         globals.set("wait", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
@@ -116,26 +104,6 @@ public class LuaCraft extends JavaPlugin implements TabExecutor {
                     Thread.sleep(seconds * 1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
-                return NIL;
-            }
-        });
-
-        globals.set("summon", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                String entityName = args.checkjstring(1);
-                if (lastSender instanceof Player) {
-                    Player player = (Player) lastSender;
-                    Vec3 position;
-                    if (args.narg() >= 4) {
-                        position = Vec3.fromArgs(args);
-                    } else {
-                        position = new Vec3(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
-                    }
-                    EntityUtils.summonEntity(entityName, position, player);
-                } else {
-                    lastSender.sendMessage(translateColorCodes("You must be a player to summon entities."));
                 }
                 return NIL;
             }
@@ -154,18 +122,6 @@ public class LuaCraft extends JavaPlugin implements TabExecutor {
                 return NIL;
             }
         });
-    }
-
-    private void loadLuaScripts() {
-        File folder = new File(getDataFolder(), "scripts");
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-        for (File file : folder.listFiles()) {
-            if (file.getName().endsWith(".lua")) {
-                globals.loadfile(file.getAbsolutePath());
-            }
-        }
     }
 
     private Component translateColorCodes(String message) {
@@ -198,9 +154,9 @@ public class LuaCraft extends JavaPlugin implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         lastSender = sender;
 
-        if (cmd.getName().equalsIgnoreCase("runscript")) {
+        if (cmd.getName().equalsIgnoreCase("loadscript")) {
             if (args.length == 0) {
-                sender.sendMessage(translateColorCodes("Usage: /runscript <script name>"));
+                sender.sendMessage(translateColorCodes("Usage: /loadscript <filename>"));
                 return true;
             }
 
@@ -218,14 +174,46 @@ public class LuaCraft extends JavaPlugin implements TabExecutor {
             }
 
             getServer().broadcast(translateColorCodes(sender.getName() + " executed the script: " + args[0]));
+            return true;
+        }
+
+        // New command for listing scripts
+        if (cmd.getName().equalsIgnoreCase("listscripts")) {
+            listScripts(sender);
+            return true;
         }
 
         return false;
     }
 
+    private void listScripts(CommandSender sender) {
+        File folder = new File(getServer().getWorldContainer(), "lua-notlive");
+        if (!folder.exists() || !folder.isDirectory()) {
+            sender.sendMessage(translateColorCodes("Lua scripts directory does not exist."));
+            return;
+        }
+
+        String[] luaFiles = folder.list((dir, name) -> name.endsWith(".lua"));
+        if (luaFiles == null || luaFiles.length == 0) {
+            sender.sendMessage(translateColorCodes("No Lua scripts found."));
+            return;
+        }
+
+        StringBuilder scriptsList = new StringBuilder("Available scripts: ");
+        for (String fileName : luaFiles) {
+            scriptsList.append(fileName.substring(0, fileName.lastIndexOf('.'))).append(", ");
+        }
+
+        if (scriptsList.length() > 2) {
+            scriptsList.setLength(scriptsList.length() - 2);
+        }
+
+        sender.sendMessage(translateColorCodes(scriptsList.toString()));
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (command.getName().equalsIgnoreCase("runscript") && args.length == 1) {
+        if (command.getName().equalsIgnoreCase("loadscript") && args.length == 1) {
             File folder = new File(getServer().getWorldContainer(), "lua-notlive");
 
             if (!folder.exists() || !folder.isDirectory()) {
@@ -242,6 +230,12 @@ public class LuaCraft extends JavaPlugin implements TabExecutor {
 
             return completions;
         }
+
+        if (command.getName().equalsIgnoreCase("listscripts")) {
+            return List.of();
+        }
+
         return null;
     }
+
 }

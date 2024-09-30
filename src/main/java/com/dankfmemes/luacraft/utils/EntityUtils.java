@@ -1,4 +1,4 @@
-package org.dankfmemes.luacraft.utils;
+package com.dankfmemes.luacraft.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

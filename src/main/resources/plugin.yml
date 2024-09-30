@@ -1,7 +1,7 @@
 name: LuaCraft
 version: 1.0
 api-version: 1.21
-main: org.dankfmemes.luacraft.LuaCraft
+main: com.dankfmemes.luacraft.LuaCraft
 commands:
   runscript:
     description: Run a Lua script

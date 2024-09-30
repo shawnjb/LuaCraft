@@ -16,9 +16,21 @@ import com.dankfmemes.luacraft.utils.Vec3;
 
 import net.kyori.adventure.text.Component;
 
+/**
+ * The LuaCraftLibrary class provides a collection of functions that can be
+ * used in Lua scripts for interacting with Minecraft players, entities,
+ * and the game world. It allows Lua scripts to execute commands, manipulate
+ * player inventories, and access player and entity data.
+ */
 public class LuaCraftLibrary {
     private final LuaCraft plugin;
 
+    /**
+     * Constructs a LuaCraftLibrary instance with the specified LuaCraft plugin.
+     *
+     * @param plugin the instance of the LuaCraft plugin used for interaction
+     *               with the Minecraft server and its functionalities.
+     */
     public LuaCraftLibrary(LuaCraft plugin) {
         this.plugin = plugin;
     }
@@ -32,7 +44,18 @@ public class LuaCraftLibrary {
                 String playerName = args.checkjstring(1);
                 Player targetPlayer = Bukkit.getPlayer(playerName);
                 if (targetPlayer != null) {
-                    return new LuaCraftPlayer(targetPlayer).toLuaValue(); // Convert to LuaValue
+                    return new LuaCraftPlayer(targetPlayer).toLuaValue();
+                }
+                return LuaValue.NIL;
+            }
+        });
+
+        table.set("getLocalPlayer", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                if (plugin.getLastSender() instanceof Player) {
+                    Player player = (Player) plugin.getLastSender();
+                    return new LuaCraftPlayer(player).toLuaValue();
                 }
                 return LuaValue.NIL;
             }
@@ -46,7 +69,7 @@ public class LuaCraftLibrary {
 
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     LuaCraftPlayer luaCraftPlayer = new LuaCraftPlayer(onlinePlayer);
-                    playersTable.set(index++, luaCraftPlayer.toLuaValue()); // Add player to Lua table
+                    playersTable.set(index++, luaCraftPlayer.toLuaValue());
                 }
 
                 return playersTable;
@@ -240,31 +263,26 @@ public class LuaCraftLibrary {
         table.set("modifyEntityData", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
-                // Ensure we have a UUID and a data table
                 if (args.isstring(1) && args.istable(2)) {
                     String entityUUID = args.checkjstring(1);
                     LuaValue dataTable = args.checktable(2);
 
-                    // Use LuaCraftEntity to manage the entity
                     LuaCraftEntity luaCraftEntity = new LuaCraftEntity(entityUUID);
                     if (!luaCraftEntity.isValid()) {
                         plugin.getLastSender().sendMessage("Entity with the given UUID not found.");
                         return LuaValue.NIL;
                     }
 
-                    // Modify custom name
                     LuaValue customName = dataTable.get("customName");
                     if (!customName.isnil()) {
                         luaCraftEntity.setCustomName(customName.tojstring());
                     }
 
-                    // Modify health
                     LuaValue health = dataTable.get("health");
                     if (!health.isnil()) {
                         luaCraftEntity.setHealth(health.todouble());
                     }
 
-                    // Modify position
                     LuaValue position = dataTable.get("position");
                     if (!position.isnil() && position.istable()) {
                         double x = position.get("x").todouble();
@@ -273,13 +291,11 @@ public class LuaCraftLibrary {
                         luaCraftEntity.teleport(x, y, z);
                     }
 
-                    // Modify charged state (for Creepers)
                     LuaValue charged = dataTable.get("charged");
                     if (!charged.isnil()) {
                         luaCraftEntity.setCharged(charged.toboolean());
                     }
 
-                    // Modify isBaby state (for Ageable entities)
                     LuaValue isBaby = dataTable.get("isBaby");
                     if (!isBaby.isnil()) {
                         luaCraftEntity.setBaby(isBaby.toboolean());

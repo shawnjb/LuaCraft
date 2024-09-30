@@ -21,7 +21,6 @@ public class LuaCraftLibrary {
     public void registerFunctions(Globals globals) {
         LuaValue table = LuaValue.tableOf();
 
-        // Add the print function
         table.set("print", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
@@ -33,17 +32,16 @@ public class LuaCraftLibrary {
                 if (plugin.getLastSender() != null) {
                     plugin.getLastSender().sendMessage(chatMessage);
                 }
-                return LuaValue.NIL; // Use LuaValue.NIL instead of just NIL
+                return LuaValue.NIL;
             }
         });
 
-        // Add the colorize function
         table.set("colorize", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
                 String color = args.checkjstring(1);
                 String text = args.checkjstring(2);
-                return LuaValue.valueOf("&" + color + text); // Return as LuaValue
+                return LuaValue.valueOf("&" + color + text);
             }
         });
 
@@ -61,13 +59,13 @@ public class LuaCraftLibrary {
             }
         });
 
-        // Add the runcommand function
         table.set("runcommand", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
                 String command = args.checkjstring(1);
                 if (plugin.getLastSender() instanceof Player) {
                     Player player = (Player) plugin.getLastSender();
+                    command = command.replace("@p", player.getName());
                     Bukkit.dispatchCommand(player, command);
                 } else {
                     plugin.getLastSender()
@@ -77,7 +75,6 @@ public class LuaCraftLibrary {
             }
         });
 
-        // Register the table under the name 'luacraft'
         globals.set("luacraft", table);
     }
 }

@@ -1,16 +1,13 @@
 package com.dankfmemes.luacraft;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.luaj.vm2.*;
-import org.luaj.vm2.lib.VarArgFunction;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
+import com.dankfmemes.luacraft.lib.LuaCraftLibrary;
 import com.dankfmemes.luacraft.utils.Undumper;
 
 import java.io.*;
@@ -18,8 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LuaCraft extends JavaPlugin {
-    public CommandSender lastSender;
+    private CommandSender lastSender;
     private Globals globals;
+    private LuaCraftLibrary luaCraftLibrary;
+
+    public CommandSender getLastSender() {
+        return lastSender;
+    }
 
     @Override
     public void onEnable() {
@@ -27,6 +29,7 @@ public class LuaCraft extends JavaPlugin {
 
         this.globals = JsePlatform.standardGlobals();
         this.globals.undumper = new Undumper(this.globals);
+        luaCraftLibrary = new LuaCraftLibrary(this); // Initialize the LuaCraftLibrary
 
         File luaDir = new File(getDataFolder(), "lua");
         if (!luaDir.exists()) {
@@ -62,7 +65,7 @@ public class LuaCraft extends JavaPlugin {
             getLogger().severe("Lua error while loading init.lua: " + e.getMessage());
         }
 
-        registerNativeFunctions();
+        luaCraftLibrary.registerFunctions(globals); // Register LuaCraftLibrary functions
     }
 
     @Override
@@ -71,60 +74,7 @@ public class LuaCraft extends JavaPlugin {
         this.globals = null;
     }
 
-    private void registerNativeFunctions() {
-        globals.set("print", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                StringBuilder message = new StringBuilder();
-                for (int i = 1; i <= args.narg(); i++) {
-                    message.append(args.checkjstring(i)).append(" ");
-                }
-                Component chatMessage = translateColorCodes(message.toString().trim());
-                if (lastSender != null) {
-                    lastSender.sendMessage(chatMessage);
-                }
-                return NIL;
-            }
-        });
-
-        globals.set("colorize", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                String color = args.checkjstring(1);
-                String text = args.checkjstring(2);
-                return CoerceJavaToLua.coerce("&" + color + text);
-            }
-        });
-
-        globals.set("wait", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                int seconds = args.checkint(1);
-                try {
-                    Thread.sleep(seconds * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return NIL;
-            }
-        });
-
-        globals.set("runcommand", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                String command = args.checkjstring(1);
-                if (lastSender instanceof Player) {
-                    Player player = (Player) lastSender;
-                    Bukkit.dispatchCommand(player, command);
-                } else {
-                    lastSender.sendMessage(translateColorCodes("You must be a player to run commands."));
-                }
-                return NIL;
-            }
-        });
-    }
-
-    private Component translateColorCodes(String message) {
+    public Component translateColorCodes(String message) {
         message = message.replace("&0", "§0")
                 .replace("&1", "§1")
                 .replace("&2", "§2")
@@ -237,5 +187,4 @@ public class LuaCraft extends JavaPlugin {
 
         return null;
     }
-
 }

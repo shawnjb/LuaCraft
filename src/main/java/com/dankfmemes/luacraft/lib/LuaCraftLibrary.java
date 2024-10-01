@@ -2,9 +2,13 @@ package com.dankfmemes.luacraft.lib;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.json.simple.JSONArray;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
@@ -34,6 +38,17 @@ public class LuaCraftLibrary {
     public LuaCraftLibrary(LuaCraft plugin) {
         this.plugin = plugin;
     }
+
+    public Player getPlayerFromLuaValue(LuaValue value) {
+        if (value instanceof LuaValue && value.istable()) {
+            LuaValue playerTable = value;
+            LuaValue playerName = playerTable.get("getName");
+            if (!playerName.isnil()) {
+                return Bukkit.getPlayer(playerName.tojstring());
+            }
+        }
+        return null;
+    }    
 
     public void registerFunctions(Globals globals) {
         LuaValue table = LuaValue.tableOf();
@@ -118,9 +133,9 @@ public class LuaCraftLibrary {
         table.set("colorize", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
-                String color = args.checkjstring(1);
+                String colorCode = args.checkjstring(1);
                 String text = args.checkjstring(2);
-                return LuaValue.valueOf("&" + color + text);
+                return LuaValue.valueOf("§" + colorCode + text);
             }
         });
 
@@ -315,6 +330,32 @@ public class LuaCraftLibrary {
                 return LuaValue.NIL;
             }
         });
+
+        // Adding the createItem function
+        table.set("createItem", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                String materialName = args.checkjstring(1); // Get the material name (e.g., 'NETHERITE_SWORD')
+                LuaValue playerLua = args.checkvalue(2);    // Get the player from Lua
+        
+                Player player = getPlayerFromLuaValue(playerLua);  // Use the helper method to get the Player
+        
+                if (player != null) {
+                    Material material = Material.getMaterial(materialName.toUpperCase());
+                    if (material != null) {
+                        ItemStack itemStack = new ItemStack(material, 1); // Create the item (default amount: 1)
+                        LuaCraftItem luaCraftItem = new LuaCraftItem(itemStack);
+                        player.getInventory().addItem(itemStack);  // Add the item to the player's inventory
+                        return luaCraftItem.toLuaValue();  // Return the item to Lua
+                    } else {
+                        plugin.getLastSender().sendMessage(plugin.translateColorCodes("Invalid material: " + materialName));
+                    }
+                } else {
+                    plugin.getLastSender().sendMessage("Invalid player.");
+                }
+                return LuaValue.NIL;
+            }
+        });        
 
         globals.set("luacraft", table);
     }

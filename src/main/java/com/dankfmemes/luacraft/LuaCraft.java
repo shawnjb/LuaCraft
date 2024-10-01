@@ -1,6 +1,9 @@
 package com.dankfmemes.luacraft;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -175,9 +178,14 @@ public class LuaCraft extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         lastSender = sender;
 
+        // Define the prefix without bold
+        Component prefix = Component.text("[LuaCraft] ")
+                .color(NamedTextColor.LIGHT_PURPLE);
+
         if (cmd.getName().equalsIgnoreCase("loadscript")) {
             if (args.length == 0) {
-                sender.sendMessage(translateColorCodes("Usage: /loadscript <filename>"));
+                sender.sendMessage(prefix.append(Component.text("Usage: /loadscript <filename>")
+                        .color(NamedTextColor.RED)));
                 return true;
             }
 
@@ -186,50 +194,74 @@ public class LuaCraft extends JavaPlugin {
                 try {
                     LuaValue chunk = globals.loadfile(scriptFile.getAbsolutePath());
                     chunk.call();
-                    sender.sendMessage(translateColorCodes("Script executed successfully."));
+                    sender.sendMessage(prefix.append(Component.text("Script executed successfully.")
+                            .color(NamedTextColor.GREEN)));
                 } catch (LuaError e) {
-                    sender.sendMessage(translateColorCodes("Error executing script: " + e.getMessage()));
+                    sender.sendMessage(prefix.append(Component.text("Error executing script: " + e.getMessage())
+                            .color(NamedTextColor.RED)));
                 }
             } else {
-                sender.sendMessage(translateColorCodes("Script not found: " + args[0]));
+                sender.sendMessage(prefix.append(Component.text("Script not found: ")
+                        .color(NamedTextColor.RED)
+                        .append(Component.text(args[0])
+                                .color(NamedTextColor.RED)
+                                .decorate(TextDecoration.ITALIC))));
             }
 
-            getServer().broadcast(translateColorCodes(sender.getName() + " executed the script: " + args[0]));
+            // Apply italics to script name in broadcast
+            Component scriptName = Component.text(args[0])
+                    .color(NamedTextColor.YELLOW)
+                    .decorate(TextDecoration.ITALIC);
+
+            getServer().broadcast(prefix.append(Component.text(sender.getName() + " executed the script: ")
+                    .color(NamedTextColor.YELLOW)
+                    .append(scriptName)));
             return true;
         }
 
-        // New command for listing scripts
+        // Other command handling (e.g., list scripts)
         if (cmd.getName().equalsIgnoreCase("listscripts")) {
-            listScripts(sender);
+            listScripts(sender, prefix);
             return true;
         }
 
         return false;
     }
 
-    private void listScripts(CommandSender sender) {
+    // Modify listScripts to accept prefix
+    private void listScripts(CommandSender sender, Component prefix) {
         File folder = new File(getServer().getWorldContainer(), "lua-notlive");
         if (!folder.exists() || !folder.isDirectory()) {
-            sender.sendMessage(translateColorCodes("Lua scripts directory does not exist."));
+            sender.sendMessage(prefix.append(Component.text("Lua scripts directory does not exist.")
+                    .color(NamedTextColor.RED)));
             return;
         }
 
         String[] luaFiles = folder.list((dir, name) -> name.endsWith(".lua"));
         if (luaFiles == null || luaFiles.length == 0) {
-            sender.sendMessage(translateColorCodes("No Lua scripts found."));
+            sender.sendMessage(prefix.append(Component.text("No Lua scripts found.")
+                    .color(NamedTextColor.RED)));
             return;
         }
 
-        StringBuilder scriptsList = new StringBuilder("Available scripts: ");
-        for (String fileName : luaFiles) {
-            scriptsList.append(fileName.substring(0, fileName.lastIndexOf('.'))).append(", ");
+        // Build the scripts list with italic script names
+        Component scriptsList = Component.text("Available scripts: ")
+                .color(NamedTextColor.GREEN);
+
+        for (int i = 0; i < luaFiles.length; i++) {
+            String scriptNameStr = luaFiles[i].substring(0, luaFiles[i].lastIndexOf('.'));
+            Component scriptName = Component.text(scriptNameStr)
+                    .color(NamedTextColor.AQUA)
+                    .decorate(TextDecoration.ITALIC);
+
+            scriptsList = scriptsList.append(scriptName);
+
+            if (i < luaFiles.length - 1) {
+                scriptsList = scriptsList.append(Component.text(", ").color(NamedTextColor.GREEN));
+            }
         }
 
-        if (scriptsList.length() > 2) {
-            scriptsList.setLength(scriptsList.length() - 2);
-        }
-
-        sender.sendMessage(translateColorCodes(scriptsList.toString()));
+        sender.sendMessage(prefix.append(scriptsList));
     }
 
     @Override

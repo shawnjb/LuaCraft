@@ -1,6 +1,11 @@
 --- @meta
 
 --- @class LuaCraft
+LuaCraft = {}
+
+--- @type LuaCraft
+--- Removed. Use `LuaCraft`.
+--- @deprecated
 luacraft = {}
 
 --- @class LuaCraftPlayer
@@ -64,74 +69,65 @@ local LuaCraftPlayer = {
 --- Prints messages to the last command sender's chat.
 --- @vararg ... The messages to be printed.
 --- ```lua
---- luacraft.print("Hello, World!")
---- luacraft.print("Your score is", score)
+--- LuaCraft.print("Hello, World!")
+--- LuaCraft.print("Your score is", score)
 --- ```
-function luacraft.print(...) end
-
---- Colorizes a given text using Minecraft's color codes.
---- @param color string The color code (e.g., "a" for green).
---- @param text string The text to be colorized.
---- @return string @The colorized text.
---- ```lua
---- local message = luacraft.colorize("a", "This is green text.")
---- ```
-function luacraft.colorize(color, text) end
+function LuaCraft.print(...) end
 
 --- Pauses the execution for a specified number of seconds.
 --- @param seconds number The duration to wait in seconds.
 --- ```lua
---- luacraft.wait(5) -- Waits for 5 seconds without blocking other processes.
+--- LuaCraft.wait(5) -- Waits for 5 seconds without blocking other processes.
 --- ```
-function luacraft.wait(seconds) end
+function LuaCraft.wait(seconds) end
 
 --- Blocks execution for a specified number of seconds.
 --- @param seconds number The duration to sleep in seconds.
 --- ```lua
---- luacraft.sleep(2.5) -- Blocks execution for 2.5 seconds.
+--- LuaCraft.sleep(2.5) -- Blocks execution for 2.5 seconds.
 --- ```
-function luacraft.sleep(seconds) end
+function LuaCraft.sleep(seconds) end
 
 --- Executes a command as the last command sender.
 --- Only players can run commands.
 --- @param command string The command to be executed.
 --- ```lua
---- luacraft.runcommand("/give @p diamond 1")
+--- LuaCraft.runcommand("/give @p diamond 1")
 --- ```
 --- @deprecated
-function luacraft.runcommand(command) end
+function LuaCraft.runcommand(command) end
 
 --- Executes a command as the last command sender.
 --- Only players can run commands.
 --- @param command string The command to be executed.
 --- ```lua
---- luacraft.runCommand("/give @p diamond 1")
+--- LuaCraft.runCommand("/give @p diamond 1")
 --- ```
-function luacraft.runCommand(command) end
+function LuaCraft.runCommand(command) end
 
 --- Applies a new position to the executing player.
 --- @param x integer The new X coordinate.
 --- @param y integer The new Y coordinate.
 --- @param z integer The new Z coordinate.
 --- ```lua
---- luacraft.setPlayerPosition(0, 120, 0)
+--- LuaCraft.setPlayerPosition(0, 120, 0)
 --- ```
-function luacraft.setPlayerPosition(x, y, z) end
+function LuaCraft.setPlayerPosition(x, y, z) end
 
 --- Retrieves the position of the executing player.
 --- @return { x: integer, y: integer, z: integer }
 --- ```lua
---- local vec3 = luacraft.getPlayerPosition()
+--- local vec3 = LuaCraft.getPlayerPosition()
 --- print(vec3.x, vec3.y, vec3.z)
 --- ```
-function luacraft.getPlayerPosition() end
+function LuaCraft.getPlayerPosition() end
 
 --- Retrieves the executing player as a LuaCraftPlayer object.
 --- @return LuaCraftPlayer @The player object.
 --- ```lua
---- local player = luacraft.getLocalPlayer()
+--- local player = LuaCraft.getLocalPlayer()
 --- ```
-function luacraft.getLocalPlayer() end
+function LuaCraft.getLocalPlayer() end
 
 --- Summons an entity at the specified coordinates.
 --- The entity is identified by its Enum name.
@@ -141,13 +137,13 @@ function luacraft.getLocalPlayer() end
 --- @param z number The Z coordinate where the entity should be summoned.
 --- ```lua
 --- -- Summons a creeper at (100, 64, 100)
---- luacraft.summonAtPosition("CREEPER", 100, 64, 100)
+--- LuaCraft.summonAtPosition("CREEPER", 100, 64, 100)
 ---
 --- -- Summons a skeleton at the player's current position
---- local pos = luacraft.getPlayerPosition()
---- luacraft.summonAtPosition("SKELETON", pos.x, pos.y, pos.z)
+--- local pos = LuaCraft.getPlayerPosition()
+--- LuaCraft.summonAtPosition("SKELETON", pos.x, pos.y, pos.z)
 --- ```
-function luacraft.summonAtPosition(entityName, x, y, z) end
+function LuaCraft.summonAtPosition(entityName, x, y, z) end
 
 --- Retrieves all entities in the player's world as a JSON string.
 --- @return string @A JSON array containing information about all entities, where each entry has:
@@ -155,10 +151,10 @@ function luacraft.summonAtPosition(entityName, x, y, z) end
 ---   - `type`: string (The type of the entity)
 ---   - `position`: table (A table containing the x, y, z coordinates of the entity's location)
 --- ```lua
---- local allEntities = luacraft.getAllEntities()
+--- local allEntities = LuaCraft.getAllEntities()
 --- print(allEntities) -- Outputs a JSON string of all entities
 --- ```
-function luacraft.getAllEntities() end
+function LuaCraft.getAllEntities() end
 
 --- Modifies an entity's properties based on a table of attributes.
 --- @param entityUUID string The UUID of the entity to be modified.
@@ -176,39 +172,73 @@ function luacraft.getAllEntities() end
 ---     charged = true,
 ---     isBaby = false
 --- }
---- luacraft.modifyEntityData("entity-uuid", mods)
+--- LuaCraft.modifyEntityData("entity-uuid", mods)
 --- ```
-function luacraft.modifyEntityData(entityUUID, modifications) end
+function LuaCraft.modifyEntityData(entityUUID, modifications) end
 
 --- Logs a message to the server console.
 --- @vararg string The message to log.
 --- This function takes a single string argument and logs it to the
 --- Bukkit server console with the prefix "[LuaCraft]".
 --- ```lua
---- luacraft.consoleMessage("This is a log message.")
+--- LuaCraft.consoleMessage("This is a log message.")
 --- ```
-function luacraft.consoleMessage(...) end
+function LuaCraft.consoleMessage(...) end
 
 --- @class LuaCraftItem
 --- Represents an item in the game.
 --- Currently, this class has no methods or fields defined.
 local LuaCraftItem = {}
 
---- Creates an item and optionally applies enchantments and a custom name.
---- The item is added to the player's inventory upon creation.
---- @param materialName string The name of the material (e.g., "DIAMOND_SWORD", "IRON_PICKAXE").
---- @param player LuaCraftPlayer The player who will receive the item.
---- @param enchantments? table Optional table of enchantments where each entry is a table with:
----   - [1] string: The enchantment name (e.g., "sharpness", "unbreaking").
----   - [2] number: The enchantment level.
---- @param customName? string Optional custom name to set for the item.
---- @return LuaCraftItem @The created ItemStack object.
+--- @class LuaCraftItemData
+local LuaCraftItemData = {
+    --- @type LuaCraftPlayer
+    player = nil,
+    --- @type string
+    name = nil,
+    --- @type { [number]: string }
+    lore = {},
+    --- @type { [string]: number }
+    enchantments = {},
+}
+
+--- Creates an item with custom properties such as a name, lore, and enchantments, 
+--- and adds it to the player's inventory.
+--- 
+--- @param materialName string The name of the material (e.g., "DIAMOND_SWORD", "NETHERITE_SWORD").
+--- @param itemData LuaCraftItemData A table containing the properties for the item:
+---   - `player` LuaCraftPlayer: The player who will receive the item.
+---   - `name`? string: Optional custom name for the item, with color codes.
+---   - `lore`? table: Optional table of lore lines for the item.
+---   - `enchantments`? table: Optional table of enchantments, each entry containing:
+---     - `[1]` string: The enchantment name (e.g., "sharpness", "unbreaking").
+---     - `[2]` number: The enchantment level.
+---
+--- @return LuaCraftItem @The created item, as a LuaCraftItem object.
+---
 --- ```lua
---- -- Example usage:
---- local enchantments = {
----     { "sharpness", 5 },
----     { "unbreaking", 3 }
+--- local itemData = {
+---     player = LuaCraft.getLocalPlayer(),
+---     name = "&r&6Legendary Sword",
+---     lore = {
+---         "&r&7This sword was forged in the depths of the nether.",
+---         "&r&fUnbreakable and powerful."
+---     },
+---     enchantments = {
+---         { "sharpness", 5 },
+---         { "unbreaking", 3 }
+---     }
 --- }
---- local item = luacraft.createItem("DIAMOND_SWORD", player, enchantments, "Legendary Sword")
+--- local item = LuaCraft.createItem("NETHERITE_SWORD", itemData)
 --- ```
-function luacraft.createItem(materialName, player, enchantments, customName) end
+function LuaCraft.createItem(materialName, itemData) end
+
+--- Converts all ampersands (&) in a string to the section (§) symbol.
+--- This is typically used for formatting codes in text where the section symbol is a control character.
+--- @param inputString string The string in which ampersands will be replaced with the section symbol.
+--- @return string @The modified string with all ampersands replaced by section symbols.
+--- ```lua
+--- local formattedText = LuaCraft.toSections("&cHello, &aWorld!")
+--- print(formattedText) -- Output: §cHello, §aWorld!
+--- ```
+function LuaCraft.toSections(inputString) end

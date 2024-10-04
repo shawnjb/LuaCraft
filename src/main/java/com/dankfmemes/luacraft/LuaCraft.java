@@ -49,15 +49,15 @@ public class LuaCraft extends JavaPlugin {
 
         this.globals = JsePlatform.standardGlobals();
         this.globals.undumper = new Undumper(this.globals);
-        luaCraftLibrary = new LuaCraftLibrary(this); // Initialize the LuaCraftLibrary
+        luaCraftLibrary = new LuaCraftLibrary(this);
 
-        File luaDir = new File(getDataFolder(), "lua");
+        File luaDir = new File(getServer().getWorldContainer(), "lua");
         if (!luaDir.exists()) {
             luaDir.mkdirs();
             getLogger().info("Created lua directory at " + luaDir.getAbsolutePath());
         }
 
-        File luaNotLiveDir = new File(getDataFolder(), "lua-notlive");
+        File luaNotLiveDir = new File(getServer().getWorldContainer(), "lua-notlive");
         if (!luaNotLiveDir.exists()) {
             luaNotLiveDir.mkdirs();
             getLogger().info("Created lua-notlive directory at " + luaNotLiveDir.getAbsolutePath());
@@ -108,8 +108,8 @@ public class LuaCraft extends JavaPlugin {
     private void checkForUpdates() {
         new Thread(() -> {
             try {
-                URI uri = new URI(GITHUB_API_URL); // Create a URI instance
-                URL url = uri.toURL(); // Convert URI to URL
+                URI uri = new URI(GITHUB_API_URL);
+                URL url = uri.toURL();
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
 
@@ -123,13 +123,12 @@ public class LuaCraft extends JavaPlugin {
                     }
                     reader.close();
 
-                    // Parse JSON response using org.json.simple
                     JSONParser parser = new JSONParser();
                     JSONArray tags = (JSONArray) parser.parse(jsonResponse.toString());
 
                     if (tags.size() > 0) {
-                        JSONObject latestTag = (JSONObject) tags.get(0); // Get the first tag
-                        String latestVersion = (String) latestTag.get("name"); // Get the name of the latest tag
+                        JSONObject latestTag = (JSONObject) tags.get(0);
+                        String latestVersion = (String) latestTag.get("name");
 
                         if (!currentVersion.equals(latestVersion)) {
                             getLogger().info("A new version is available: " + latestVersion);
@@ -178,7 +177,6 @@ public class LuaCraft extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         lastSender = sender;
 
-        // Define the prefix without bold
         Component prefix = Component.text("[LuaCraft] ")
                 .color(NamedTextColor.LIGHT_PURPLE);
 
@@ -208,7 +206,6 @@ public class LuaCraft extends JavaPlugin {
                                 .decorate(TextDecoration.ITALIC))));
             }
 
-            // Apply italics to script name in broadcast
             Component scriptName = Component.text(args[0])
                     .color(NamedTextColor.YELLOW)
                     .decorate(TextDecoration.ITALIC);
@@ -219,7 +216,6 @@ public class LuaCraft extends JavaPlugin {
             return true;
         }
 
-        // Other command handling (e.g., list scripts)
         if (cmd.getName().equalsIgnoreCase("listscripts")) {
             listScripts(sender, prefix);
             return true;
@@ -228,7 +224,6 @@ public class LuaCraft extends JavaPlugin {
         return false;
     }
 
-    // Modify listScripts to accept prefix
     private void listScripts(CommandSender sender, Component prefix) {
         File folder = new File(getServer().getWorldContainer(), "lua-notlive");
         if (!folder.exists() || !folder.isDirectory()) {
@@ -244,7 +239,6 @@ public class LuaCraft extends JavaPlugin {
             return;
         }
 
-        // Build the scripts list with italic script names
         Component scriptsList = Component.text("Available scripts: ")
                 .color(NamedTextColor.GREEN);
 

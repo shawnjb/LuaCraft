@@ -16,9 +16,12 @@ import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.dankfmemes.luacraft.LuaCraft;
 import com.dankfmemes.luacraft.utils.Vec3;
+import com.dankfmemes.luacraft.utils.TextFormatter;
 
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
@@ -134,12 +137,12 @@ public class LuaCraftLibrary {
             }
         });
 
-        table.set("colorize", new VarArgFunction() {
+        table.set("toSections", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
-                String colorCode = args.checkjstring(1);
-                String text = args.checkjstring(2);
-                return LuaValue.valueOf("§" + colorCode + text);
+                String inputString = args.checkjstring(1);
+                String resultString = inputString.replace("&", "§");
+                return LuaValue.valueOf(resultString);
             }
         });
 
@@ -338,57 +341,89 @@ public class LuaCraftLibrary {
         table.set("createItem", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
+                plugin.getLogger().info("createItem called");
+        
                 String materialName = args.checkjstring(1);
-                LuaValue playerLua = args.checkvalue(2);
-                LuaValue enchantmentsTable = args.optvalue(3, LuaValue.NIL);
-                LuaValue customName = args.optvalue(4, LuaValue.NIL);
-
+                LuaValue itemData = args.checktable(2);
+                LuaValue playerLua = itemData.get("player");
                 Player player = getPlayerFromLuaValue(playerLua);
-
+        
                 if (player != null) {
+                    plugin.getLogger().info("Player found: " + player.getName());
+        
                     Material material = Material.getMaterial(materialName.toUpperCase());
                     if (material != null) {
+                        plugin.getLogger().info("Material found: " + materialName);
+                        
                         ItemStack itemStack = new ItemStack(material, 1);
-
+                        ItemMeta meta = itemStack.getItemMeta();
+                        
+                        LuaValue customName = itemData.get("name");
                         if (customName.isstring()) {
-                            ItemMeta meta = itemStack.getItemMeta();
-                            meta.displayName(Component.text(customName.tojstring()));
-                            itemStack.setItemMeta(meta);
+                            plugin.getLogger().info("Setting custom name: " + customName.tojstring());
+                            meta.displayName(Component.text(TextFormatter.toSections(customName.tojstring())));
                         }
-
+                        
+                        LuaValue loreTable = itemData.get("lore");
+                        if (loreTable.istable()) {
+                            plugin.getLogger().info("Setting lore");
+                            List<Component> loreList = new ArrayList<>();
+                            LuaValue loreKey = LuaValue.NIL;
+                            while ((loreKey = loreTable.next(loreKey).arg1()).isnil() == false) {
+                                String loreLine = loreTable.get(loreKey).tojstring();
+                                loreList.add(Component.text(TextFormatter.toSections(loreLine)));
+                                plugin.getLogger().info("Lore line added: " + loreLine);
+                            }
+                            meta.lore(loreList);
+                        }
+                        
+                        LuaValue enchantmentsTable = itemData.get("enchantments");
                         if (enchantmentsTable.istable()) {
+                            plugin.getLogger().info("Applying enchantments");
                             LuaValue enchantKey = LuaValue.NIL;
                             while ((enchantKey = enchantmentsTable.next(enchantKey).arg1()).isnil() == false) {
                                 LuaValue enchantmentData = enchantmentsTable.get(enchantKey);
                                 String enchantmentName = enchantmentData.get(1).tojstring();
                                 int level = enchantmentData.get(2).toint();
-
-                                RegistryKey<Enchantment> enchantmentRegistryKey = RegistryKey.ENCHANTMENT;
-                                Registry<Enchantment> enchantmentRegistry = RegistryAccess.registryAccess()
-                                        .getRegistry(enchantmentRegistryKey);
-
-                                Enchantment enchantment = enchantmentRegistry
-                                        .getOrThrow(NamespacedKey.minecraft(enchantmentName.toLowerCase()));
-
+                                
+                                plugin.getLogger().info("Processing enchantment: " + enchantmentName + " with level " + level);
+                                
+                                Registry<Enchantment> enchantmentRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+        
+                                Enchantment enchantment = enchantmentRegistry.getOrThrow(NamespacedKey.minecraft(enchantmentName.toLowerCase()));
+        
                                 if (enchantment != null) {
-                                    itemStack.addUnsafeEnchantment(enchantment, level);
+                                    meta.addEnchant(enchantment, level, true);
+                                    // itemStack.addUnsafeEnchantment(enchantment, level);
+                                    plugin.getLogger().info("Enchantment applied: " + enchantmentName);
+                                } else {
+                                    plugin.getLastSender().sendMessage("Invalid enchantment: " + enchantmentName);
+                                    plugin.getLogger().warning("Invalid enchantment: " + enchantmentName);
                                 }
                             }
+                        } else {
+                            plugin.getLogger().info("No enchantments provided.");
                         }
 
+                        itemStack.setItemMeta(meta);
                         player.getInventory().addItem(itemStack);
+                        plugin.getLogger().info("Item added to player: " + player.getName());
+                        plugin.getLogger().info("Item Meta: " + itemStack.getItemMeta().toString());
                         return LuaValue.userdataOf(itemStack);
                     } else {
-                        plugin.getLastSender()
-                                .sendMessage(plugin.translateColorCodes("Invalid material: " + materialName));
+                        plugin.getLastSender().sendMessage(plugin.translateColorCodes("Invalid material: " + materialName));
+                        plugin.getLogger().warning("Invalid material: " + materialName);
                     }
                 } else {
                     plugin.getLastSender().sendMessage("Invalid player.");
+                    plugin.getLogger().warning("Invalid player");
                 }
+                
                 return LuaValue.NIL;
             }
         });
+        
 
-        globals.set("luacraft", table);
+        globals.set("LuaCraft", table);
     }
 }

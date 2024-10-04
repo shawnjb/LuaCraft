@@ -55,7 +55,6 @@ public class Vec3 {
         return table;
     }
 
-    // Convert from Lua table to Vec3
     public static Vec3 fromLua(LuaValue table) {
         double x = table.get("x").todouble();
         double y = table.get("y").todouble();
@@ -80,7 +79,6 @@ public class Vec3 {
         globals.set("Vec3", vec3Table);
     }
 
-    // Example method to add two Vec3 instances
     public Vec3 add(Vec3 other) {
         return new Vec3(this.x + other.x, this.y + other.y, this.z + other.z);
     }

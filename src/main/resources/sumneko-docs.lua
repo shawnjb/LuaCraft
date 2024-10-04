@@ -188,3 +188,27 @@ function luacraft.modifyEntityData(entityUUID, modifications) end
 --- luacraft.consoleMessage("This is a log message.")
 --- ```
 function luacraft.consoleMessage(...) end
+
+--- @class LuaCraftItem
+--- Represents an item in the game.
+--- Currently, this class has no methods or fields defined.
+local LuaCraftItem = {}
+
+--- Creates an item and optionally applies enchantments and a custom name.
+--- The item is added to the player's inventory upon creation.
+--- @param materialName string The name of the material (e.g., "DIAMOND_SWORD", "IRON_PICKAXE").
+--- @param player LuaCraftPlayer The player who will receive the item.
+--- @param enchantments? table Optional table of enchantments where each entry is a table with:
+---   - [1] string: The enchantment name (e.g., "sharpness", "unbreaking").
+---   - [2] number: The enchantment level.
+--- @param customName? string Optional custom name to set for the item.
+--- @return LuaCraftItem @The created ItemStack object.
+--- ```lua
+--- -- Example usage:
+--- local enchantments = {
+---     { "sharpness", 5 },
+---     { "unbreaking", 3 }
+--- }
+--- local item = luacraft.createItem("DIAMOND_SWORD", player, enchantments, "Legendary Sword")
+--- ```
+function luacraft.createItem(materialName, player, enchantments, customName) end

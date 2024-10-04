@@ -4,11 +4,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.json.simple.JSONArray;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
@@ -18,6 +20,8 @@ import org.luaj.vm2.LuaValue;
 import com.dankfmemes.luacraft.LuaCraft;
 import com.dankfmemes.luacraft.utils.Vec3;
 
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.text.Component;
 
 /**
@@ -48,7 +52,7 @@ public class LuaCraftLibrary {
             }
         }
         return null;
-    }    
+    }
 
     public void registerFunctions(Globals globals) {
         LuaValue table = LuaValue.tableOf();
@@ -331,31 +335,59 @@ public class LuaCraftLibrary {
             }
         });
 
-        // Adding the createItem function
         table.set("createItem", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
-                String materialName = args.checkjstring(1); // Get the material name (e.g., 'NETHERITE_SWORD')
-                LuaValue playerLua = args.checkvalue(2);    // Get the player from Lua
-        
-                Player player = getPlayerFromLuaValue(playerLua);  // Use the helper method to get the Player
-        
+                String materialName = args.checkjstring(1);
+                LuaValue playerLua = args.checkvalue(2);
+                LuaValue enchantmentsTable = args.optvalue(3, LuaValue.NIL);
+                LuaValue customName = args.optvalue(4, LuaValue.NIL);
+
+                Player player = getPlayerFromLuaValue(playerLua);
+
                 if (player != null) {
                     Material material = Material.getMaterial(materialName.toUpperCase());
                     if (material != null) {
-                        ItemStack itemStack = new ItemStack(material, 1); // Create the item (default amount: 1)
-                        LuaCraftItem luaCraftItem = new LuaCraftItem(itemStack);
-                        player.getInventory().addItem(itemStack);  // Add the item to the player's inventory
-                        return luaCraftItem.toLuaValue();  // Return the item to Lua
+                        ItemStack itemStack = new ItemStack(material, 1);
+
+                        if (customName.isstring()) {
+                            ItemMeta meta = itemStack.getItemMeta();
+                            meta.displayName(Component.text(customName.tojstring()));
+                            itemStack.setItemMeta(meta);
+                        }
+
+                        if (enchantmentsTable.istable()) {
+                            LuaValue enchantKey = LuaValue.NIL;
+                            while ((enchantKey = enchantmentsTable.next(enchantKey).arg1()).isnil() == false) {
+                                LuaValue enchantmentData = enchantmentsTable.get(enchantKey);
+                                String enchantmentName = enchantmentData.get(1).tojstring();
+                                int level = enchantmentData.get(2).toint();
+
+                                RegistryKey<Enchantment> enchantmentRegistryKey = RegistryKey.ENCHANTMENT;
+                                Registry<Enchantment> enchantmentRegistry = RegistryAccess.registryAccess()
+                                        .getRegistry(enchantmentRegistryKey);
+
+                                Enchantment enchantment = enchantmentRegistry
+                                        .getOrThrow(NamespacedKey.minecraft(enchantmentName.toLowerCase()));
+
+                                if (enchantment != null) {
+                                    itemStack.addUnsafeEnchantment(enchantment, level);
+                                }
+                            }
+                        }
+
+                        player.getInventory().addItem(itemStack);
+                        return LuaValue.userdataOf(itemStack);
                     } else {
-                        plugin.getLastSender().sendMessage(plugin.translateColorCodes("Invalid material: " + materialName));
+                        plugin.getLastSender()
+                                .sendMessage(plugin.translateColorCodes("Invalid material: " + materialName));
                     }
                 } else {
                     plugin.getLastSender().sendMessage("Invalid player.");
                 }
                 return LuaValue.NIL;
             }
-        });        
+        });
 
         globals.set("luacraft", table);
     }

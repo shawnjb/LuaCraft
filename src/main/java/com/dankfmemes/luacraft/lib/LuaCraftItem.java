@@ -14,19 +14,9 @@ public class LuaCraftItem {
         this.itemStack = itemStack;
     }
 
-    public void applyCustomName(String customName) {
-
-    }
-    
-    public void applyEnchantment(String enchantmentName, int level) {
-        
-    }    
-
     public LuaValue toLuaValue() {
         LuaValue itemTable = LuaValue.tableOf();
 
-
-        
         return itemTable;
     }
 }

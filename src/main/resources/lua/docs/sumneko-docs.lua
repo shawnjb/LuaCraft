@@ -242,3 +242,26 @@ function LuaCraft.consoleMessage(...) end
 --- })
 --- ```
 function LuaCraft.createItem(materialName, itemData) end
+
+--- Retrieves the block type the player is currently standing on.
+--- @return string @The block type (e.g., "STONE", "GRASS_BLOCK") that the player is standing on.
+--- ```lua
+--- local blockType = LuaCraft.getPlayerBlockType()
+--- print("You are standing on: " .. blockType)
+--- ```
+function LuaCraft.getPlayerBlockType() end
+
+--- Sets the player's movement speed.
+--- @param speed number The desired speed, between -10 and 10. A value of 1 is the maximum forward speed, and -1 is the maximum reverse speed.
+--- ```lua
+--- LuaCraft.setPlayerSpeed(5) -- Set speed to 50% of the maximum forward speed
+--- ```
+function LuaCraft.setPlayerSpeed(speed) end
+
+--- Sets the player's flight speed.
+--- @param speed number The desired flight speed, between 1 and 10. A value of 1 corresponds to the slowest flight speed (0.1), and 10 corresponds to the maximum flight speed (1.0).
+--- ```lua
+--- LuaCraft.setPlayerFlightSpeed(5) -- Set flight speed to 50% of the maximum flight speed
+--- LuaCraft.setPlayerFlightSpeed(10) -- Set flight speed to the maximum
+--- ```
+function LuaCraft.setPlayerFlightSpeed(speed) end

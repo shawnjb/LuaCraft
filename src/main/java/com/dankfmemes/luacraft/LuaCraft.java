@@ -71,7 +71,6 @@ public class LuaCraft extends JavaPlugin {
 
                     LuaValue chunk = globals.loadfile(file.getAbsolutePath());
                     chunk.call();
-                    getLogger().info("Executed " + file.getName());
                 } catch (LuaError e) {
                     getLogger().severe("Error executing " + file.getName() + ": " + e.getMessage());
                 }
@@ -194,7 +193,7 @@ public class LuaCraft extends JavaPlugin {
      * greater.
      * 
      * @param currentVersion The current version string (e.g., "1.1.0").
-     * @param latestVersion  The latest version string from GitHub (e.g., "1.1.1").
+     * @param latestVersion  The latest version string from GitHub (e.g., "1.1.2").
      * @return True if the latest version is greater than the current version, false
      *         otherwise.
      */
@@ -274,30 +273,27 @@ public class LuaCraft extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         lastSender = sender;
-    
+
         Component prefix = Component.text("[LuaCraft] ")
                 .color(NamedTextColor.LIGHT_PURPLE);
-    
+
         if (cmd.getName().equalsIgnoreCase("loadscript")) {
             if (args.length == 0) {
                 sender.sendMessage(prefix.append(Component.text("Usage: /loadscript <filename>")
                         .color(NamedTextColor.RED)));
                 return true;
             }
-    
+
             File scriptFile = new File(getServer().getWorldContainer(), "lua/" + args[0] + ".lua");
-    
+
             if (scriptFile.exists()) {
                 try {
-                    globals.set("script", LuaValue.tableOf(new LuaValue[]{
-                        LuaValue.valueOf("name"), LuaValue.valueOf(scriptFile.getName())
+                    globals.set("script", LuaValue.tableOf(new LuaValue[] {
+                            LuaValue.valueOf("name"), LuaValue.valueOf(scriptFile.getName())
                     }));
-    
+
                     LuaValue chunk = globals.loadfile(scriptFile.getAbsolutePath());
                     chunk.call();
-    
-                    sender.sendMessage(prefix.append(Component.text("Script executed successfully.")
-                            .color(NamedTextColor.GREEN)));
                 } catch (LuaError e) {
                     sender.sendMessage(prefix.append(Component.text("Error executing script: " + e.getMessage())
                             .color(NamedTextColor.RED)));
@@ -309,24 +305,16 @@ public class LuaCraft extends JavaPlugin {
                                 .color(NamedTextColor.RED)
                                 .decorate(TextDecoration.ITALIC))));
             }
-    
-            Component scriptName = Component.text(args[0])
-                    .color(NamedTextColor.YELLOW)
-                    .decorate(TextDecoration.ITALIC);
-    
-            getServer().broadcast(prefix.append(Component.text(sender.getName() + " executed the script: ")
-                    .color(NamedTextColor.YELLOW)
-                    .append(scriptName)));
             return true;
         }
-    
+
         if (cmd.getName().equalsIgnoreCase("listscripts")) {
             listScripts(sender, prefix);
             return true;
         }
-    
+
         return false;
-    }    
+    }
 
     private void listScripts(CommandSender sender, Component prefix) {
         File folder = new File(getServer().getWorldContainer(), "lua");

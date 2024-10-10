@@ -431,6 +431,77 @@ public class LuaCraftLibrary {
             }
         });
 
+        table.set("getPlayerBlockType", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                if (plugin.getLastSender() instanceof Player) {
+                    Player player = (Player) plugin.getLastSender();
+                    Location location = player.getLocation().clone();
+                    location.setY(location.getY() - 1);
+
+                    Material blockType = location.getBlock().getType();
+
+                    return LuaValue.valueOf(blockType.name());
+                } else {
+                    plugin.getLastSender()
+                            .sendMessage(plugin.translateColorCodes("You must be a player to get block type."));
+                }
+                return LuaValue.NIL;
+            }
+        });
+
+        table.set("setPlayerSpeed", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                if (plugin.getLastSender() instanceof Player) {
+                    Player player = (Player) plugin.getLastSender();
+                    float inputSpeed = (float) args.checkdouble(1);
+
+                    if (inputSpeed < 1.0f || inputSpeed > 10.0f) {
+                        plugin.getLastSender()
+                                .sendMessage(plugin.translateColorCodes("Speed must be between &91&f and &910&f"));
+                        return LuaValue.NIL;
+                    }
+
+                    float scaledSpeed = inputSpeed / 10.0f;
+
+                    player.setWalkSpeed(scaledSpeed);
+                    plugin.getLastSender().sendMessage(plugin.translateColorCodes("Player speed set to " + inputSpeed));
+                    return LuaValue.valueOf(inputSpeed);
+                } else {
+                    plugin.getLastSender()
+                            .sendMessage(plugin.translateColorCodes("You must be a player to set speed."));
+                }
+                return LuaValue.NIL;
+            }
+        });
+
+        table.set("setPlayerFlightSpeed", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                if (plugin.getLastSender() instanceof Player) {
+                    Player player = (Player) plugin.getLastSender();
+                    float inputSpeed = (float) args.checkdouble(1);
+
+                    if (inputSpeed < 1.0f || inputSpeed > 10.0f) {
+                        plugin.getLastSender()
+                                .sendMessage(plugin.translateColorCodes("Flight speed must be between &91&f and &910&f"));
+                        return LuaValue.NIL;
+                    }
+
+                    float scaledSpeed = inputSpeed / 10.0f;
+
+                    player.setFlySpeed(scaledSpeed);
+                    plugin.getLastSender()
+                            .sendMessage(plugin.translateColorCodes("Player flight speed set to " + inputSpeed));
+                    return LuaValue.valueOf(inputSpeed);
+                } else {
+                    plugin.getLastSender()
+                            .sendMessage(plugin.translateColorCodes("You must be a player to set flight speed."));
+                }
+                return LuaValue.NIL;
+            }
+        });
         globals.set("LuaCraft", table);
     }
 }

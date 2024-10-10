@@ -11,7 +11,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.json.simple.JSONArray;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.Globals;
@@ -264,20 +263,21 @@ public class LuaCraftLibrary {
         table.set("getAllEntities", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
-                JSONArray entityArray = new JSONArray();
-
+                LuaValue entitiesTable = LuaValue.tableOf(); // Create a Lua table
+                int index = 1;
+        
                 if (plugin.getLastSender() instanceof Player) {
                     Player player = (Player) plugin.getLastSender();
                     for (Entity entity : player.getWorld().getEntities()) {
                         LuaCraftEntity luaCraftEntity = new LuaCraftEntity(entity);
-                        entityArray.add(luaCraftEntity.getEntityDataAsJson());
+                        entitiesTable.set(index++, luaCraftEntity.toLuaValue()); // Add LuaCraftEntity to Lua table
                     }
-                    return LuaValue.valueOf(entityArray.toJSONString());
+                    return entitiesTable; // Return Lua table
                 } else {
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("You must be a player to get entity data."));
+                          .sendMessage(plugin.translateColorCodes("You must be a player to get entity data."));
                 }
-
+        
                 return LuaValue.NIL;
             }
         });

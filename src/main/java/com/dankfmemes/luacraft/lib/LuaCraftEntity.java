@@ -7,6 +7,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.LivingEntity;
 import org.json.simple.JSONObject;
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
 import net.kyori.adventure.text.Component;
@@ -195,5 +196,22 @@ public class LuaCraftEntity {
         if (entity instanceof LivingEntity) {
             ((LivingEntity) entity).setAI(enabled);
         }
+    }
+
+    /**
+     * Converts the LuaCraftEntity into a LuaValue (Lua table) representation.
+     *
+     * @return A Lua table containing entity data.
+     */
+    public LuaValue toLuaValue() {
+        LuaTable entityTable = LuaValue.tableOf();
+
+        entityTable.set("id", LuaValue.valueOf(entity.getUniqueId().toString()));
+        entityTable.set("type", LuaValue.valueOf(entity.getType().toString()));
+        entityTable.set("x", LuaValue.valueOf(entity.getLocation().getX()));
+        entityTable.set("y", LuaValue.valueOf(entity.getLocation().getY()));
+        entityTable.set("z", LuaValue.valueOf(entity.getLocation().getZ()));
+
+        return entityTable;
     }
 }

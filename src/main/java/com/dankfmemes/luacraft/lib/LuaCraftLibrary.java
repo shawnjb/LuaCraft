@@ -358,12 +358,15 @@ public class LuaCraftLibrary {
                         ItemStack itemStack = new ItemStack(material, 1);
                         ItemMeta meta = itemStack.getItemMeta();
 
+                        // name
                         LuaValue customName = itemData.get("name");
                         if (customName.isstring()) {
                             plugin.getLogger().info("Setting custom name: " + customName.tojstring());
-                            meta.displayName(Component.text(TextFormatter.toSections(customName.tojstring())));
+                            Component coloredName = plugin.toHexColors(customName.tojstring());
+                            meta.displayName(coloredName);
                         }
 
+                        // lore
                         LuaValue loreTable = itemData.get("lore");
                         if (loreTable.istable()) {
                             plugin.getLogger().info("Setting lore");
@@ -371,12 +374,14 @@ public class LuaCraftLibrary {
                             LuaValue loreKey = LuaValue.NIL;
                             while ((loreKey = loreTable.next(loreKey).arg1()).isnil() == false) {
                                 String loreLine = loreTable.get(loreKey).tojstring();
-                                loreList.add(Component.text(TextFormatter.toSections(loreLine)));
+                                Component coloredLoreLine = plugin.toHexColors(loreLine);
+                                loreList.add(coloredLoreLine);
                                 plugin.getLogger().info("Lore line added: " + loreLine);
                             }
                             meta.lore(loreList);
                         }
 
+                        // enchantments
                         LuaValue enchantmentsTable = itemData.get("enchantments");
                         if (enchantmentsTable.istable()) {
                             plugin.getLogger().info("Applying enchantments");

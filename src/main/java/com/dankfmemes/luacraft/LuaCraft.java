@@ -52,16 +52,19 @@ public class LuaCraft extends JavaPlugin {
         luaCraftLibrary = new LuaCraftLibrary(this);
 
         File luaDir = new File(getServer().getWorldContainer(), "lua");
+        File luaNotLiveDir = new File(getServer().getWorldContainer(), "lua-notlive/docs");
+
         if (!luaDir.exists()) {
             luaDir.mkdirs();
             getLogger().info("Created lua directory at " + luaDir.getAbsolutePath());
         }
 
-        File luaNotLiveDir = new File(getServer().getWorldContainer(), "lua-notlive");
         if (!luaNotLiveDir.exists()) {
             luaNotLiveDir.mkdirs();
-            getLogger().info("Created lua-notlive directory at " + luaNotLiveDir.getAbsolutePath());
+            getLogger().info("Created lua-notlive/docs directory at " + luaNotLiveDir.getAbsolutePath());
         }
+
+        copyResourceToServer("sumneko-docs.lua", new File(luaNotLiveDir, "sumneko-docs.lua"));
 
         File initFile = new File(luaDir, "init.lua");
         if (!initFile.exists()) {
@@ -88,6 +91,44 @@ public class LuaCraft extends JavaPlugin {
         luaCraftLibrary.registerFunctions(globals);
         Vec3.registerVec3(globals);
         globals.get("print").call(LuaValue.valueOf("Vec3 module registered."));
+    }
+
+    /**
+     * Copies a resource from the JAR to the server's filesystem, replacing the file
+     * if it exists.
+     *
+     * @param resourceName The name of the resource in the JAR.
+     * @param targetFile   The target file on the server's filesystem.
+     */
+    private void copyResourceToServer(String resourceName, File targetFile) {
+        if (targetFile.exists()) {
+            if (targetFile.delete()) {
+                getLogger().info("Existing file " + targetFile.getName() + " deleted.");
+            } else {
+                getLogger().severe("Failed to delete existing file: " + targetFile.getName());
+                return;
+            }
+        }
+
+        try (InputStream in = getResource(resourceName);
+                OutputStream out = new FileOutputStream(targetFile)) {
+
+            if (in == null) {
+                getLogger().severe("Resource " + resourceName + " not found in the JAR.");
+                return;
+            }
+
+            byte[] buffer = new byte[1024];
+            int length;
+
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+
+            getLogger().info("Successfully copied " + resourceName + " to " + targetFile.getAbsolutePath());
+        } catch (IOException e) {
+            getLogger().severe("Failed to copy resource " + resourceName + ": " + e.getMessage());
+        }
     }
 
     private void loadConfig() {

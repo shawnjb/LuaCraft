@@ -66,6 +66,87 @@ local LuaCraftPlayer = {
     runCommand = function(command) end
 }
 
+--- @class LuaCraftEntity
+--- Represents an entity in the game.
+--- Contains methods to interact with and manipulate the entity.
+local LuaCraftEntity = {
+    --- Retrieves the entity's UUID.
+    --- @return string @The UUID of the entity.
+    --- ```lua
+    --- local uuid = entity:getUUID()
+    --- print("Entity UUID:", uuid)
+    --- ```
+    getUUID = function() end,
+
+    --- Retrieves the entity's type.
+    --- @return string @The type of the entity (e.g., "CREEPER", "ZOMBIE").
+    --- ```lua
+    --- local entityType = entity:getType()
+    --- print("Entity type:", entityType)
+    --- ```
+    getType = function() end,
+
+    --- Retrieves the entity's position as a table.
+    --- @return { x: number, y: number, z: number }
+    --- ```lua
+    --- local position = entity:getPosition()
+    --- print(position.x, position.y, position.z)
+    --- ```
+    getPosition = function() end,
+
+    --- Teleports the entity to the specified coordinates.
+    --- @param x number The X coordinate.
+    --- @param y number The Y coordinate.
+    --- @param z number The Z coordinate.
+    --- ```lua
+    --- entity:teleport(100, 64, 100)
+    --- ```
+    teleport = function(x, y, z) end,
+
+    --- Sets a custom name for the entity.
+    --- @param name string The custom name to set.
+    --- ```lua
+    --- entity:setCustomName("Boss Monster")
+    --- ```
+    setCustomName = function(name) end,
+
+    --- Retrieves the custom name of the entity.
+    --- @return string|nil @The custom name of the entity or nil if no custom name is set.
+    --- ```lua
+    --- local name = entity:getCustomName()
+    --- print("Entity name:", name)
+    --- ```
+    getCustomName = function() end,
+
+    --- Sets the health of the entity (if it's a living entity).
+    --- @param health number The health value to set.
+    --- ```lua
+    --- entity:setHealth(20)
+    --- ```
+    setHealth = function(health) end,
+
+    --- Enables or disables the AI of the entity (if it's a living entity).
+    --- @param enabled boolean True to enable AI, false to disable it.
+    --- ```lua
+    --- entity:setAI(false) -- Disable AI
+    --- ```
+    setAI = function(enabled) end,
+
+    --- Sets whether the entity is a baby (if it's an ageable entity).
+    --- @param isBaby boolean True to make the entity a baby, false to make it an adult.
+    --- ```lua
+    --- entity:setBaby(true)
+    --- ```
+    setBaby = function(isBaby) end,
+
+    --- Sets whether a Creeper is charged.
+    --- @param charged boolean True to charge the Creeper, false to discharge it.
+    --- ```lua
+    --- entity:setCharged(true)
+    --- ```
+    setCharged = function(charged) end
+}
+
 --- Prints messages to the last command sender's chat.
 --- @vararg ... The messages to be printed.
 --- ```lua
@@ -73,6 +154,20 @@ local LuaCraftPlayer = {
 --- LuaCraft.print("Your score is", score)
 --- ```
 function LuaCraft.print(...) end
+
+--- Broadcasts a message to all players on the server.
+--- @param message string The message to broadcast.
+--- ```lua
+--- LuaCraft.broadcast("Server is restarting soon!")
+--- ```
+function LuaCraft.broadcast(message) end
+
+--- Logs a message to the server console with a "[LuaCraft]" prefix.
+--- @param message string The message to log.
+--- ```lua
+--- LuaCraft.consoleMessage("Script execution started.")
+--- ```
+function LuaCraft.consoleMessage(message) end
 
 --- Pauses the execution for a specified number of seconds.
 --- @param seconds number The duration to wait in seconds.
@@ -145,14 +240,13 @@ function LuaCraft.getLocalPlayer() end
 --- ```
 function LuaCraft.summonAtPosition(entityName, x, y, z) end
 
---- Retrieves all entities in the player's world as a JSON string.
---- @return string @A JSON array containing information about all entities, where each entry has:
----   - `id`: string (The UUID of the entity)
----   - `type`: string (The type of the entity)
----   - `position`: table (A table containing the x, y, z coordinates of the entity's location)
+--- Retrieves all entities in the player's world as a Lua table.
+--- @return { [number]: LuaCraftEntity } @A table where each entry is a LuaCraftEntity object.
 --- ```lua
 --- local allEntities = LuaCraft.getAllEntities()
---- print(allEntities) -- Outputs a JSON string of all entities
+--- for i, entity in ipairs(allEntities) do
+---     print(entity.id, entity.type)
+--- end
 --- ```
 function LuaCraft.getAllEntities() end
 

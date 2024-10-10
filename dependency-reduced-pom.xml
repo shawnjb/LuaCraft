@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dankfmemes</groupId>
   <artifactId>LuaCraft</artifactId>
-  <version>1.1</version>
+  <version>1.1.1</version>
   <build>
     <resources>
       <resource>
@@ -29,6 +29,8 @@
                   <artifact>*:*</artifact>
                   <includes>
                     <include>**/*.class</include>
+                    <include>**/*.lua</include>
+                    <include>*.lua</include>
                     <include>plugin.yml</include>
                     <include>config.yml</include>
                   </includes>

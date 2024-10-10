@@ -171,7 +171,7 @@ public class LuaCraft extends JavaPlugin {
                         JSONObject latestTag = (JSONObject) tags.get(0);
                         String latestVersion = (String) latestTag.get("name");
 
-                        if (!currentVersion.equals(latestVersion)) {
+                        if (isNewerVersion(currentVersion, latestVersion)) {
                             getLogger().info("A new version is available: " + latestVersion);
                         } else {
                             getLogger().info("You are using the latest version: " + currentVersion);
@@ -186,6 +186,33 @@ public class LuaCraft extends JavaPlugin {
                 getLogger().severe("An error occurred while checking for updates: " + e.getMessage());
             }
         }).start();
+    }
+
+    /**
+     * Compares two semantic version strings and determines if the new version is
+     * greater.
+     * 
+     * @param currentVersion The current version string (e.g., "1.1.0").
+     * @param latestVersion  The latest version string from GitHub (e.g., "1.1.1").
+     * @return True if the latest version is greater than the current version, false
+     *         otherwise.
+     */
+    private boolean isNewerVersion(String currentVersion, String latestVersion) {
+        String[] currentParts = currentVersion.split("\\.");
+        String[] latestParts = latestVersion.split("\\.");
+
+        int maxLength = Math.max(currentParts.length, latestParts.length);
+        for (int i = 0; i < maxLength; i++) {
+            int currentPart = (i < currentParts.length) ? Integer.parseInt(currentParts[i]) : 0;
+            int latestPart = (i < latestParts.length) ? Integer.parseInt(latestParts[i]) : 0;
+
+            if (latestPart > currentPart) {
+                return true;
+            } else if (latestPart < currentPart) {
+                return false;
+            }
+        }
+        return false;
     }
 
     public Component translateColorCodes(String message) {

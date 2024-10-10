@@ -4,19 +4,19 @@ api-version: 1.21
 main: com.dankfmemes.luacraft.LuaCraft
 commands:
   loadscript:
-    description: Load and execute a Lua script from the lua-notlive directory
+    description: Load and execute a Lua script from the lua directory
     usage: /<command> <filename>
     permissions:
       luacraft.loadscript:
-        description: Allows execution of Lua scripts by loading them from lua-notlive
+        description: Allows execution of Lua scripts by loading them from lua
   listscripts:
-    description: List all available Lua scripts in the lua-notlive directory
+    description: List all available Lua scripts in the lua directory
     usage: /<command>
     permissions:
       luacraft.listscripts:
         description: Allows viewing of available Lua scripts
 permissions:
   luacraft.loadscript:
-    description: Allows execution of Lua scripts by loading them from lua-notlive
+    description: Allows execution of Lua scripts by loading them from lua
   luacraft.listscripts:
     description: Allows viewing of available Lua scripts

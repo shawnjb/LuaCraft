@@ -25,6 +25,8 @@ import com.dankfmemes.luacraft.utils.TextFormatter;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 /**
  * The LuaCraftLibrary class provides a collection of functions that can be
@@ -104,13 +106,13 @@ public class LuaCraftLibrary {
                 for (int i = 1; i <= args.narg(); i++) {
                     message.append(args.checkjstring(i)).append(" ");
                 }
-                String[] messages = message.toString().trim().split("\\\\n");
-                for (String msg : messages) {
-                    Component chatMessage = plugin.translateColorCodes(msg.trim());
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        player.sendMessage(chatMessage);
-                    }
+
+                Component chatMessage = plugin.toHexColors(message.toString().trim());
+
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    player.sendMessage(chatMessage);
                 }
+
                 return LuaValue.NIL;
             }
         });
@@ -122,16 +124,14 @@ public class LuaCraftLibrary {
                 for (int i = 1; i <= args.narg(); i++) {
                     message.append(args.checkjstring(i)).append(" ");
                 }
-                String fullMessage = message.toString().trim();
-                String[] messages = fullMessage.split("\\\\n");
-                Bukkit.getLogger().info("[LuaCraft Broadcast] " + fullMessage);
 
-                for (String msg : messages) {
-                    Component chatMessage = plugin.translateColorCodes(msg.trim());
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        player.sendMessage(chatMessage);
-                    }
+                Component chatMessage = plugin.toHexColors(message.toString().trim());
+                Bukkit.getLogger().info("[LuaCraft Broadcast] " + message.toString().trim());
+
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    player.sendMessage(chatMessage);
                 }
+
                 return LuaValue.NIL;
             }
         });
@@ -263,21 +263,21 @@ public class LuaCraftLibrary {
         table.set("getAllEntities", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
-                LuaValue entitiesTable = LuaValue.tableOf(); // Create a Lua table
+                LuaValue entitiesTable = LuaValue.tableOf();
                 int index = 1;
-        
+
                 if (plugin.getLastSender() instanceof Player) {
                     Player player = (Player) plugin.getLastSender();
                     for (Entity entity : player.getWorld().getEntities()) {
                         LuaCraftEntity luaCraftEntity = new LuaCraftEntity(entity);
-                        entitiesTable.set(index++, luaCraftEntity.toLuaValue()); // Add LuaCraftEntity to Lua table
+                        entitiesTable.set(index++, luaCraftEntity.toLuaValue());
                     }
-                    return entitiesTable; // Return Lua table
+                    return entitiesTable;
                 } else {
                     plugin.getLastSender()
-                          .sendMessage(plugin.translateColorCodes("You must be a player to get entity data."));
+                            .sendMessage(plugin.translateColorCodes("You must be a player to get entity data."));
                 }
-        
+
                 return LuaValue.NIL;
             }
         });
@@ -310,7 +310,7 @@ public class LuaCraftLibrary {
                         double x = position.get("x").todouble();
                         double y = position.get("y").todouble();
                         double z = position.get("z").todouble();
-                        luaCraftEntity.teleport(x, y, z);
+                        luaCraftEntity.setPosition(x, y, z);
                     }
 
                     LuaValue charged = dataTable.get("charged");
@@ -342,28 +342,28 @@ public class LuaCraftLibrary {
             @Override
             public Varargs invoke(Varargs args) {
                 plugin.getLogger().info("createItem called");
-        
+
                 String materialName = args.checkjstring(1);
                 LuaValue itemData = args.checktable(2);
                 LuaValue playerLua = itemData.get("player");
                 Player player = getPlayerFromLuaValue(playerLua);
-        
+
                 if (player != null) {
                     plugin.getLogger().info("Player found: " + player.getName());
-        
+
                     Material material = Material.getMaterial(materialName.toUpperCase());
                     if (material != null) {
                         plugin.getLogger().info("Material found: " + materialName);
-                        
+
                         ItemStack itemStack = new ItemStack(material, 1);
                         ItemMeta meta = itemStack.getItemMeta();
-                        
+
                         LuaValue customName = itemData.get("name");
                         if (customName.isstring()) {
                             plugin.getLogger().info("Setting custom name: " + customName.tojstring());
                             meta.displayName(Component.text(TextFormatter.toSections(customName.tojstring())));
                         }
-                        
+
                         LuaValue loreTable = itemData.get("lore");
                         if (loreTable.istable()) {
                             plugin.getLogger().info("Setting lore");
@@ -376,7 +376,7 @@ public class LuaCraftLibrary {
                             }
                             meta.lore(loreList);
                         }
-                        
+
                         LuaValue enchantmentsTable = itemData.get("enchantments");
                         if (enchantmentsTable.istable()) {
                             plugin.getLogger().info("Applying enchantments");
@@ -385,16 +385,18 @@ public class LuaCraftLibrary {
                                 LuaValue enchantmentData = enchantmentsTable.get(enchantKey);
                                 String enchantmentName = enchantmentData.get(1).tojstring();
                                 int level = enchantmentData.get(2).toint();
-                                
-                                plugin.getLogger().info("Processing enchantment: " + enchantmentName + " with level " + level);
-                                
-                                Registry<Enchantment> enchantmentRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
-        
-                                Enchantment enchantment = enchantmentRegistry.getOrThrow(NamespacedKey.minecraft(enchantmentName.toLowerCase()));
-        
+
+                                plugin.getLogger()
+                                        .info("Processing enchantment: " + enchantmentName + " with level " + level);
+
+                                Registry<Enchantment> enchantmentRegistry = RegistryAccess.registryAccess()
+                                        .getRegistry(RegistryKey.ENCHANTMENT);
+
+                                Enchantment enchantment = enchantmentRegistry
+                                        .getOrThrow(NamespacedKey.minecraft(enchantmentName.toLowerCase()));
+
                                 if (enchantment != null) {
                                     meta.addEnchant(enchantment, level, true);
-                                    // itemStack.addUnsafeEnchantment(enchantment, level);
                                     plugin.getLogger().info("Enchantment applied: " + enchantmentName);
                                 } else {
                                     plugin.getLastSender().sendMessage("Invalid enchantment: " + enchantmentName);
@@ -411,18 +413,18 @@ public class LuaCraftLibrary {
                         plugin.getLogger().info("Item Meta: " + itemStack.getItemMeta().toString());
                         return LuaValue.userdataOf(itemStack);
                     } else {
-                        plugin.getLastSender().sendMessage(plugin.translateColorCodes("Invalid material: " + materialName));
+                        plugin.getLastSender()
+                                .sendMessage(plugin.translateColorCodes("Invalid material: " + materialName));
                         plugin.getLogger().warning("Invalid material: " + materialName);
                     }
                 } else {
                     plugin.getLastSender().sendMessage("Invalid player.");
                     plugin.getLogger().warning("Invalid player");
                 }
-                
+
                 return LuaValue.NIL;
             }
         });
-        
 
         globals.set("LuaCraft", table);
     }

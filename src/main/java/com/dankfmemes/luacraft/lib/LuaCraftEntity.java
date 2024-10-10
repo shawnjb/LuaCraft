@@ -9,6 +9,8 @@ import org.bukkit.entity.LivingEntity;
 import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
+import org.luaj.vm2.lib.VarArgFunction;
 
 import net.kyori.adventure.text.Component;
 
@@ -123,13 +125,13 @@ public class LuaCraftEntity {
     }
 
     /**
-     * Teleports the entity to a specified position.
+     * Sets the position of the entity to a specified location.
      * 
-     * @param x The x-coordinate to teleport to.
-     * @param y The y-coordinate to teleport to.
-     * @param z The z-coordinate to teleport to.
+     * @param x The x-coordinate to move to.
+     * @param y The y-coordinate to move to.
+     * @param z The z-coordinate to move to.
      */
-    public void teleport(double x, double y, double z) {
+    public void setPosition(double x, double y, double z) {
         if (entity != null) {
             Location newLocation = new Location(entity.getWorld(), x, y, z);
             entity.teleport(newLocation);
@@ -199,18 +201,67 @@ public class LuaCraftEntity {
     }
 
     /**
+     * Returns the current position of the entity as a Lua table.
+     *
+     * @return A Lua table with x, y, and z fields containing the current position.
+     */
+    public LuaTable getPosition() {
+        Location location = entity.getLocation();
+        LuaTable positionTable = LuaValue.tableOf();
+        positionTable.set("x", LuaValue.valueOf(location.getX()));
+        positionTable.set("y", LuaValue.valueOf(location.getY()));
+        positionTable.set("z", LuaValue.valueOf(location.getZ()));
+        return positionTable;
+    }
+
+    /**
      * Converts the LuaCraftEntity into a LuaValue (Lua table) representation.
      *
-     * @return A Lua table containing entity data.
+     * @return A Lua table containing entity data and functions.
      */
     public LuaValue toLuaValue() {
         LuaTable entityTable = LuaValue.tableOf();
 
-        entityTable.set("id", LuaValue.valueOf(entity.getUniqueId().toString()));
-        entityTable.set("type", LuaValue.valueOf(entity.getType().toString()));
-        entityTable.set("x", LuaValue.valueOf(entity.getLocation().getX()));
-        entityTable.set("y", LuaValue.valueOf(entity.getLocation().getY()));
-        entityTable.set("z", LuaValue.valueOf(entity.getLocation().getZ()));
+        entityTable.set("setPosition", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                double x = args.arg(1).todouble();
+                double y = args.arg(2).todouble();
+                double z = args.arg(3).todouble();
+                setPosition(x, y, z);
+                return LuaValue.NIL;
+            }
+        });
+
+        entityTable.set("setCustomName", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                String name = args.arg(1).tojstring();
+                setCustomName(name);
+                return LuaValue.NIL;
+            }
+        });
+
+        entityTable.set("getPosition", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                return getPosition();
+            }
+        });
+
+        entityTable.set("getType", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                return LuaValue.valueOf(entity.getType().toString());
+            }
+        });
+
+        entityTable.set("getUUID", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                return LuaValue.valueOf(getUUID());
+            }
+        });
 
         return entityTable;
     }

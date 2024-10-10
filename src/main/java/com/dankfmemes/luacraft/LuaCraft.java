@@ -1,8 +1,12 @@
 package com.dankfmemes.luacraft;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -25,6 +29,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LuaCraft extends JavaPlugin {
     private static final String GITHUB_API_URL = "https://api.github.com/repos/dankfmemes/LuaCraft/tags";
@@ -52,40 +58,26 @@ public class LuaCraft extends JavaPlugin {
         luaCraftLibrary = new LuaCraftLibrary(this);
 
         File luaDir = new File(getServer().getWorldContainer(), "lua");
-        File luaNotLiveDir = new File(getServer().getWorldContainer(), "lua-notlive/docs");
+        copyResourceDirectoryToServer("lua", luaDir);
 
-        if (!luaDir.exists()) {
-            luaDir.mkdirs();
-            getLogger().info("Created lua directory at " + luaDir.getAbsolutePath());
-        }
+        File autorunDir = new File(luaDir, "autorun");
+        if (autorunDir.exists() && autorunDir.isDirectory()) {
+            getLogger().info("Executing scripts in lua/autorun...");
+            for (File file : autorunDir.listFiles((dir, name) -> name.endsWith(".lua"))) {
+                try {
+                    globals.set("script", LuaValue.tableOf(new LuaValue[] {
+                            LuaValue.valueOf("name"), LuaValue.valueOf(file.getName())
+                    }));
 
-        if (!luaNotLiveDir.exists()) {
-            luaNotLiveDir.mkdirs();
-            getLogger().info("Created lua-notlive/docs directory at " + luaNotLiveDir.getAbsolutePath());
-        }
-
-        copyResourceToServer("sumneko-docs.lua", new File(luaNotLiveDir, "sumneko-docs.lua"));
-
-        File initFile = new File(luaDir, "init.lua");
-        if (!initFile.exists()) {
-            try {
-                initFile.createNewFile();
-                getLogger().info("Created init.lua at " + initFile.getAbsolutePath());
-            } catch (IOException e) {
-                getLogger().severe("Failed to create init.lua: " + e.getMessage());
+                    LuaValue chunk = globals.loadfile(file.getAbsolutePath());
+                    chunk.call();
+                    getLogger().info("Executed " + file.getName());
+                } catch (LuaError e) {
+                    getLogger().severe("Error executing " + file.getName() + ": " + e.getMessage());
+                }
             }
-        }
-
-        try (FileInputStream fileInputStream = new FileInputStream(initFile)) {
-            LuaValue chunk = globals.load(fileInputStream, "init.lua", "bt", globals);
-            chunk.call();
-            getLogger().info("Successfully loaded init.lua");
-        } catch (FileNotFoundException e) {
-            getLogger().severe("init.lua file not found: " + e.getMessage());
-        } catch (IOException e) {
-            getLogger().severe("I/O error when loading init.lua: " + e.getMessage());
-        } catch (LuaError e) {
-            getLogger().severe("Lua error while loading init.lua: " + e.getMessage());
+        } else {
+            getLogger().info("No lua/autorun directory found, skipping autorun scripts.");
         }
 
         luaCraftLibrary.registerFunctions(globals);
@@ -94,40 +86,49 @@ public class LuaCraft extends JavaPlugin {
     }
 
     /**
-     * Copies a resource from the JAR to the server's filesystem, replacing the file
-     * if it exists.
+     * Copies a directory and its contents from the JAR to the server's filesystem,
+     * ensuring only .lua files are copied.
      *
-     * @param resourceName The name of the resource in the JAR.
-     * @param targetFile   The target file on the server's filesystem.
+     * @param resourcePath The path of the resource directory in the JAR.
+     * @param targetDir    The target directory on the server's filesystem.
      */
-    private void copyResourceToServer(String resourceName, File targetFile) {
-        if (targetFile.exists()) {
-            if (targetFile.delete()) {
-                getLogger().info("Existing file " + targetFile.getName() + " deleted.");
-            } else {
-                getLogger().severe("Failed to delete existing file: " + targetFile.getName());
-                return;
-            }
+    private void copyResourceDirectoryToServer(String resourcePath, File targetDir) {
+        if (!targetDir.exists()) {
+            targetDir.mkdirs();
         }
 
-        try (InputStream in = getResource(resourceName);
-                OutputStream out = new FileOutputStream(targetFile)) {
+        try {
+            File jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+            if (jarFile.isFile()) {
+                try (java.util.jar.JarFile jar = new java.util.jar.JarFile(jarFile)) {
+                    java.util.Enumeration<java.util.jar.JarEntry> entries = jar.entries();
+                    while (entries.hasMoreElements()) {
+                        java.util.jar.JarEntry entry = entries.nextElement();
+                        String entryName = entry.getName();
 
-            if (in == null) {
-                getLogger().severe("Resource " + resourceName + " not found in the JAR.");
-                return;
+                        if (entryName.startsWith(resourcePath) && !entry.isDirectory() && entryName.endsWith(".lua")) {
+                            String fileName = entryName.substring(resourcePath.length() + 1);
+                            File targetFile = new File(targetDir, fileName);
+
+                            targetFile.getParentFile().mkdirs();
+
+                            try (InputStream in = getResource(entryName);
+                                    OutputStream out = new FileOutputStream(targetFile)) {
+                                byte[] buffer = new byte[1024];
+                                int length;
+                                while ((length = in.read(buffer)) > 0) {
+                                    out.write(buffer, 0, length);
+                                }
+                                getLogger().info("Copied " + entryName + " to " + targetFile.getAbsolutePath());
+                            } catch (IOException e) {
+                                getLogger().severe("Failed to copy resource " + entryName + ": " + e.getMessage());
+                            }
+                        }
+                    }
+                }
             }
-
-            byte[] buffer = new byte[1024];
-            int length;
-
-            while ((length = in.read(buffer)) > 0) {
-                out.write(buffer, 0, length);
-            }
-
-            getLogger().info("Successfully copied " + resourceName + " to " + targetFile.getAbsolutePath());
-        } catch (IOException e) {
-            getLogger().severe("Failed to copy resource " + resourceName + ": " + e.getMessage());
+        } catch (Exception e) {
+            getLogger().severe("Failed to copy resource directory: " + e.getMessage());
         }
     }
 
@@ -215,6 +216,35 @@ public class LuaCraft extends JavaPlugin {
         return false;
     }
 
+    public Component toHexColors(String inputString) {
+        String regex = "&#([A-Fa-f0-9]{6})([^&#]*)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(inputString);
+
+        TextComponent.Builder finalComponent = Component.text();
+
+        int lastIndex = 0;
+        while (matcher.find()) {
+            String hexCode = matcher.group(1);
+            String textPart = matcher.group(2);
+
+            if (matcher.start() > lastIndex) {
+                finalComponent.append(Component.text(inputString.substring(lastIndex, matcher.start())));
+            }
+
+            TextColor color = TextColor.fromHexString("#" + hexCode);
+            finalComponent.append(Component.text(textPart).color(color));
+
+            lastIndex = matcher.end();
+        }
+
+        if (lastIndex < inputString.length()) {
+            finalComponent.append(Component.text(inputString.substring(lastIndex)));
+        }
+
+        return finalComponent.build();
+    }
+
     public Component translateColorCodes(String message) {
         message = message.replace("&0", "§0")
                 .replace("&1", "§1")
@@ -244,22 +274,28 @@ public class LuaCraft extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         lastSender = sender;
-
+    
         Component prefix = Component.text("[LuaCraft] ")
                 .color(NamedTextColor.LIGHT_PURPLE);
-
+    
         if (cmd.getName().equalsIgnoreCase("loadscript")) {
             if (args.length == 0) {
                 sender.sendMessage(prefix.append(Component.text("Usage: /loadscript <filename>")
                         .color(NamedTextColor.RED)));
                 return true;
             }
-
-            File scriptFile = new File(getServer().getWorldContainer(), "lua-notlive/" + args[0] + ".lua");
+    
+            File scriptFile = new File(getServer().getWorldContainer(), "lua/" + args[0] + ".lua");
+    
             if (scriptFile.exists()) {
                 try {
+                    globals.set("script", LuaValue.tableOf(new LuaValue[]{
+                        LuaValue.valueOf("name"), LuaValue.valueOf(scriptFile.getName())
+                    }));
+    
                     LuaValue chunk = globals.loadfile(scriptFile.getAbsolutePath());
                     chunk.call();
+    
                     sender.sendMessage(prefix.append(Component.text("Script executed successfully.")
                             .color(NamedTextColor.GREEN)));
                 } catch (LuaError e) {
@@ -273,27 +309,27 @@ public class LuaCraft extends JavaPlugin {
                                 .color(NamedTextColor.RED)
                                 .decorate(TextDecoration.ITALIC))));
             }
-
+    
             Component scriptName = Component.text(args[0])
                     .color(NamedTextColor.YELLOW)
                     .decorate(TextDecoration.ITALIC);
-
+    
             getServer().broadcast(prefix.append(Component.text(sender.getName() + " executed the script: ")
                     .color(NamedTextColor.YELLOW)
                     .append(scriptName)));
             return true;
         }
-
+    
         if (cmd.getName().equalsIgnoreCase("listscripts")) {
             listScripts(sender, prefix);
             return true;
         }
-
+    
         return false;
-    }
+    }    
 
     private void listScripts(CommandSender sender, Component prefix) {
-        File folder = new File(getServer().getWorldContainer(), "lua-notlive");
+        File folder = new File(getServer().getWorldContainer(), "lua");
         if (!folder.exists() || !folder.isDirectory()) {
             sender.sendMessage(prefix.append(Component.text("Lua scripts directory does not exist.")
                     .color(NamedTextColor.RED)));
@@ -329,7 +365,7 @@ public class LuaCraft extends JavaPlugin {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (command.getName().equalsIgnoreCase("loadscript") && args.length == 1) {
-            File folder = new File(getServer().getWorldContainer(), "lua-notlive");
+            File folder = new File(getServer().getWorldContainer(), "lua");
 
             if (!folder.exists() || !folder.isDirectory()) {
                 return null;

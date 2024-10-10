@@ -29,7 +29,7 @@ public class LuaCraftPlayer {
         return positionTable;
     }
 
-    public void teleport(double x, double y, double z) {
+    public void setPosition(double x, double y, double z) {
         player.teleport(new Location(player.getWorld(), x, y, z));
     }
 
@@ -95,13 +95,13 @@ public class LuaCraftPlayer {
             }
         });
 
-        playerTable.set("teleport", new VarArgFunction() {
+        playerTable.set("setPosition", new VarArgFunction() {
             @Override
             public Varargs invoke(Varargs args) {
                 double x = args.checkdouble(1);
                 double y = args.checkdouble(2);
                 double z = args.checkdouble(3);
-                teleport(x, y, z);
+                setPosition(x, y, z);
                 return LuaValue.NIL;
             }
         });

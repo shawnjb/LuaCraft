@@ -1,9 +1,9 @@
 local playerPos = LuaCraft.getLocalPlayer().getPosition()
-local allEntities = LuaCraft.getAllEntities()
+local allEntities = LuaCraft.getEntities()
 
-for i, entity in ipairs(allEntities) do
+for _, entity in ipairs(allEntities) do
 	if entity.type == 'CREEPER' then
-		entity.setPosition(playerPos.x, playerPos.y, playerPos.z)
+		entity.setPosition(playerPos)
 		LuaCraft.modifyEntityData(entity.getUUID(), {
 			charged = math.random(1, 2) == 1
 		})

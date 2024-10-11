@@ -226,13 +226,11 @@ local LuaCraftPlayer = {
 	getPosition = function() end,
 
 	--- Teleports the player to the specified coordinates.
-	--- @param x number The X coordinate.
-	--- @param y number The Y coordinate.
-	--- @param z number The Z coordinate.
+	--- @param position Vec3
 	--- ```lua
-	--- player.setPosition(100, 64, 100)
+	--- player.setPosition(Vec3.new(100, 64, 100))
 	--- ```
-	setPosition = function(x, y, z) end,
+	setPosition = function(position) end,
 
 	--- Gives an item to the player.
 	--- @param itemName string The name of the item to give.
@@ -271,13 +269,11 @@ local LuaCraftEntity = {
 	getPosition = function() end,
 
 	--- Teleports the entity to the specified coordinates.
-	--- @param x number The X coordinate.
-	--- @param y number The Y coordinate.
-	--- @param z number The Z coordinate.
+	--- @param position Vec3
 	--- ```lua
-	--- entity.setPosition(100, 64, 100)
+	--- entity.setPosition(Vec3.new(100, 64, 100))
 	--- ```
-	setPosition = function(x, y, z) end,
+	setPosition = function(position) end,
 
 	--- Sets a custom name for the entity.
 	--- @param name string The custom name to set.
@@ -417,29 +413,9 @@ function LuaCraft.runCommand(command) end
 
 --- Summons an entity at the specified position.
 --- @param entityName string The entity to summon (e.g., "CREEPER").
---- @param x number The X coordinate.
---- @param y number The Y coordinate.
---- @param z number The Z coordinate.
+--- @param position Vec3 The position to summon the entity at.
 --- ```lua
---- LuaCraft.summonAtPosition("CREEPER", 100, 64, 100)
---- ```
---- @deprecated
-function LuaCraft.summonAtPosition(entityName, x, y, z) end
-
---- Summons an entity at the specified position.
---- @param entityName string The name of the entity to summon (e.g., "ZOMBIE", "CREEPER").
---- @param position Vec3 The position where the entity will be summoned.
---- @return string|nil @The unique ID of the summoned entity, or nil if summoning failed.
----
---- Example:
---- ```lua
---- local position = Vec3.new(100, 65, 200)
---- local entityId = LuaCraft.summonEntityAt("ZOMBIE", position)
---- if entityId then
----     print("Entity summoned with ID: " .. entityId)
---- else
----     print("Failed to summon entity.")
---- end
+--- LuaCraft.summonAtPosition("CREEPER", Vec3.new(100, 64, 100))
 --- ```
 function LuaCraft.summonEntityAt(entityName, position) end
 
@@ -451,7 +427,7 @@ function LuaCraft.summonEntityAt(entityName, position) end
 ---     print(entity:getUUID())
 --- end
 --- ```
-function LuaCraft.getAllEntities() end
+function LuaCraft.getEntities() end
 
 --- Modifies an entity's data.
 --- @param entityUUID string The UUID of the entity.

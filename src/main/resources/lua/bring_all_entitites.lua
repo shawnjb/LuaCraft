@@ -1,6 +1,6 @@
 local playerPos = LuaCraft.getLocalPlayer().getPosition()
-local allEntities = LuaCraft.getAllEntities()
+local allEntities = LuaCraft.getEntities()
 
-for i, entity in ipairs(allEntities) do
-	entity.setPosition(playerPos.x, playerPos.y, playerPos.z)
+for _, entity in ipairs(allEntities) do
+	entity.setPosition(playerPos)
 end

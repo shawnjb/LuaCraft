@@ -1,7 +1,10 @@
 @echo off
 setlocal
 
-for /f "delims=" %%a in ('git describe --tags --abbrev=0 2^>nul') do set latest_tag=%%a
+REM Get the latest tag (both annotated and lightweight)
+for /f "tokens=*" %%a in ('git tag --sort=-v:refname') do (
+    if not defined latest_tag set latest_tag=%%a
+)
 
 if "%latest_tag%"=="" (
     echo No tags found!

@@ -1,4 +1,4 @@
-package com.dankfmemes.luacraft.utils;
+package com.shawnjb.luacraft.utils;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;

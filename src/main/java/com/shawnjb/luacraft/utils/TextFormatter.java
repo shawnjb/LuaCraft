@@ -1,4 +1,4 @@
-package com.dankfmemes.luacraft.utils;
+package com.shawnjb.luacraft.utils;
 
 public class TextFormatter {
     /**

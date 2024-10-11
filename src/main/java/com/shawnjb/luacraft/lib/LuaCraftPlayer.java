@@ -1,4 +1,4 @@
-package com.dankfmemes.luacraft.lib;
+package com.shawnjb.luacraft.lib;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

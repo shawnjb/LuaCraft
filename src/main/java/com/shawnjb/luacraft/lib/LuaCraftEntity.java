@@ -1,4 +1,4 @@
-package com.dankfmemes.luacraft.lib;
+package com.shawnjb.luacraft.lib;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

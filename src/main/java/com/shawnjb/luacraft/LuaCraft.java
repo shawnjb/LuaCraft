@@ -1,4 +1,4 @@
-package com.dankfmemes.luacraft;
+package com.shawnjb.luacraft;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -19,9 +19,9 @@ import org.json.simple.parser.JSONParser;
 import org.luaj.vm2.*;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
-import com.dankfmemes.luacraft.lib.LuaCraftLibrary;
-import com.dankfmemes.luacraft.utils.Undumper;
-import com.dankfmemes.luacraft.utils.Vec3;
+import com.shawnjb.luacraft.lib.LuaCraftLibrary;
+import com.shawnjb.luacraft.utils.Undumper;
+import com.shawnjb.luacraft.utils.Vec3;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -33,13 +33,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LuaCraft extends JavaPlugin {
-    private static final String GITHUB_API_URL = "https://api.github.com/repos/dankfmemes/LuaCraft/tags";
+    private static final String GITHUB_API_URL = "https://api.github.com/repos/shawnjb/LuaCraft/tags";
     private String currentVersion;
     private FileConfiguration config;
 
     private CommandSender lastSender;
     private Globals globals;
-    private LuaCraftLibrary luaCraftLibrary;
 
     public CommandSender getLastSender() {
         return lastSender;
@@ -55,7 +54,7 @@ public class LuaCraft extends JavaPlugin {
 
         this.globals = JsePlatform.standardGlobals();
         this.globals.undumper = new Undumper(this.globals);
-        luaCraftLibrary = new LuaCraftLibrary(this);
+        LuaCraftLibrary luaCraftLibrary = new LuaCraftLibrary(this);
 
         File luaDir = new File(getServer().getWorldContainer(), "lua");
         copyResourceDirectoryToServer("lua", luaDir);

@@ -1,4 +1,4 @@
-package com.dankfmemes.luacraft.lib;
+package com.shawnjb.luacraft.lib;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,15 +18,12 @@ import org.luaj.vm2.LuaValue;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dankfmemes.luacraft.LuaCraft;
-import com.dankfmemes.luacraft.utils.Vec3;
-import com.dankfmemes.luacraft.utils.TextFormatter;
+import com.shawnjb.luacraft.LuaCraft;
+import com.shawnjb.luacraft.utils.Vec3;
 
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 /**
  * The LuaCraftLibrary class provides a collection of functions that can be
@@ -502,6 +499,7 @@ public class LuaCraftLibrary {
                 return LuaValue.NIL;
             }
         });
+        
         globals.set("LuaCraft", table);
     }
 }

@@ -18,8 +18,8 @@ maven.buildMavenPackage rec {
 
   meta = {
     description = "Execute Lua scripts on your Minecraft server. This is very experimental.";
-    changelog = "https://github.com/dankfmemes/LuaCraft/releases/tag/${version}";
-    homepage = "https://github.com/dankfmemes/LuaCraft";
+    changelog = "https://github.com/shawnjb/LuaCraft/releases/tag/${version}";
+    homepage = "https://github.com/shawnjb/LuaCraft";
     license = lib.licenses.asl20;
   };
 }

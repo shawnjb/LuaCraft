@@ -2,21 +2,21 @@ name: LuaCraft
 version: 1.1.2
 api-version: 1.21
 main: com.shawnjb.luacraft.LuaCraft
+
 commands:
   loadscript:
     description: Load and execute a Lua script from the lua directory
-    usage: /<command> <filename>
-    permissions:
-      luacraft.loadscript:
-        description: Allows execution of Lua scripts by loading them from lua
+    usage: /loadscript <filename>
+    permission: luacraft.loadscript
   listscripts:
     description: List all available Lua scripts in the lua directory
-    usage: /<command>
-    permissions:
-      luacraft.listscripts:
-        description: Allows viewing of available Lua scripts
+    usage: /listscripts
+    permission: luacraft.listscripts
+
 permissions:
   luacraft.loadscript:
-    description: Allows execution of Lua scripts by loading them from lua
+    description: Allows execution of Lua scripts by loading them from the lua directory
+    default: op
   luacraft.listscripts:
     description: Allows viewing of available Lua scripts
+    default: op

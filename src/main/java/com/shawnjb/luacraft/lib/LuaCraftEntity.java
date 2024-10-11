@@ -129,7 +129,7 @@ public class LuaCraftEntity {
             }
         });
 
-        entityTable.set("getType", LuaValue.valueOf(entity.getType().toString()));
+        entityTable.set("type", LuaValue.valueOf(entity.getType().toString()));
 
         entityTable.set("getCustomName", new VarArgFunction() {
             @Override

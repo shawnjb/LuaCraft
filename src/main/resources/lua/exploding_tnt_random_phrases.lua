@@ -128,7 +128,7 @@ for _, entitySpawnInfo in pairs(entitiesToSpawn) do
 			if gridCount < count then
 				local spawnX = x + (i * spacing) - offsetX
 				local spawnZ = z + (j * spacing) - offsetZ
-				LuaCraft.summonAtPosition(entityType, spawnX, y, spawnZ)
+				LuaCraft.summonEntityAt(entityType, Vec3.new(spawnX, y, spawnZ))
 				LuaCraft.broadcast(createGradientText(generateRandomPhrase(), generateRandomHex(), generateRandomHex()))
 				LuaCraft.wait(0.1)
 				gridCount = gridCount + 1

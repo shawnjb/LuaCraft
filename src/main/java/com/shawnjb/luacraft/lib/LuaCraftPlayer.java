@@ -37,22 +37,22 @@ public class LuaCraftPlayer {
 			}
 		});
 
-		playerTable.set("getPosition", new VarArgFunction() {
-			@Override
-			public Varargs invoke(Varargs args) {
-				return getPosition();
-			}
-		});
+        playerTable.set("getPosition", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                return getPosition();
+            }
+        });
 
-		playerTable.set("setPosition", new VarArgFunction() {
-			@Override
-			public Varargs invoke(Varargs args) {
-				LuaValue vec3Table = args.checktable(1);
-				Vec3 position = Vec3.fromLua(vec3Table);
-				setPosition(position);
-				return LuaValue.NIL;
-			}
-		});
+        playerTable.set("setPosition", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                LuaValue vec3Table = args.checktable(1);
+                Vec3 position = Vec3.fromLua(vec3Table);
+                setPosition(position);
+                return LuaValue.NIL;
+            }
+        });
 
 		playerTable.set("getName", LuaValue.valueOf(player.getName()));
 		playerTable.set("isOnline", LuaValue.valueOf(player.isOnline()));

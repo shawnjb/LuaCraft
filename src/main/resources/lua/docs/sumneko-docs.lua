@@ -19,7 +19,6 @@ Vec3 = {
     z = 0,
 
     --- Creates a new Vec3 object.
-	--- @param self Vec3 The main class.
     --- @param x number The x-coordinate.
     --- @param y number The y-coordinate.
     --- @param z number The z-coordinate.
@@ -27,7 +26,7 @@ Vec3 = {
     --- ```lua
     --- local vec = Vec3:new(1, 2, 3)
     --- ```
-    new = function(self, x, y, z) end,
+    new = function(x, y, z) end,
 
 	--- Adds another vector to this vector.
 	--- @param vec3 Vec3 The other vector to add.
@@ -424,7 +423,25 @@ function LuaCraft.runCommand(command) end
 --- ```lua
 --- LuaCraft.summonAtPosition("CREEPER", 100, 64, 100)
 --- ```
+--- @deprecated
 function LuaCraft.summonAtPosition(entityName, x, y, z) end
+
+--- Summons an entity at the specified position.
+--- @param entityName string The name of the entity to summon (e.g., "ZOMBIE", "CREEPER").
+--- @param position Vec3 The position where the entity will be summoned.
+--- @return string|nil @The unique ID of the summoned entity, or nil if summoning failed.
+---
+--- Example:
+--- ```lua
+--- local position = Vec3.new(100, 65, 200)
+--- local entityId = LuaCraft.summonEntityAt("ZOMBIE", position)
+--- if entityId then
+---     print("Entity summoned with ID: " .. entityId)
+--- else
+---     print("Failed to summon entity.")
+--- end
+--- ```
+function LuaCraft.summonEntityAt(entityName, position) end
 
 --- Retrieves all entities in the world.
 --- @return { [number]: LuaCraftEntity } @A table of all entities.

@@ -45,10 +45,10 @@ public class LuaCraftEntity {
 		return entity != null && !entity.isDead();
 	}
 
-	public void setPosition(double x, double y, double z) {
-		if (entity != null)
-			entity.teleport(new Location(entity.getWorld(), x, y, z));
-	}
+    public void setPosition(Vec3 position) {
+        if (entity != null)
+            entity.teleport(new Location(entity.getWorld(), position.x, position.y, position.z));
+    }
 
 	public void setCustomName(String name) {
 		if (entity != null)
@@ -76,15 +76,15 @@ public class LuaCraftEntity {
 			((Creeper) entity).setPowered(charged);
 	}
 
-	public LuaValue getPosition() {
-		if (entity != null) {
-			Location loc = entity.getLocation();
-			Vec3 position = new Vec3(loc.getX(), loc.getY(), loc.getZ());
-			return position.toLua();
-		}
-		return LuaValue.NIL;
-	}
-
+    public LuaValue getPosition() {
+        if (entity != null) {
+            Location loc = entity.getLocation();
+            Vec3 position = new Vec3(loc.getX(), loc.getY(), loc.getZ());
+            return position.toLua();
+        }
+        return LuaValue.NIL;
+    }
+	
 	public String getUUID() {
 		return entity != null ? entity.getUniqueId().toString() : null;
 	}

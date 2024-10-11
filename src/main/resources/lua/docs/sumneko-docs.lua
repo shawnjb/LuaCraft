@@ -269,13 +269,11 @@ local LuaCraftEntity = {
     --- ```
     setCustomName = function(name) end,
 
-    --- Retrieves the entity's type as a string.
-    --- @return string @The type of the entity (e.g., "CREEPER", "ZOMBIE").
+    --- @type string @The type of the entity *(e.g., "CREEPER", "ZOMBIE")*.
     --- ```lua
-    --- local entityType = entity.getType()
-    --- print("Entity type:", entityType)
+    --- print("Entity type:", entity.type)
     --- ```
-    getType = function() end,
+    type = nil,
 
     --- Retrieves the entity's UUID as a string.
     --- @return string @The UUID of the entity.

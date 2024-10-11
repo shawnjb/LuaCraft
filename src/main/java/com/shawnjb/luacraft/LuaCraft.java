@@ -48,12 +48,21 @@ public class LuaCraft extends JavaPlugin {
         manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             var commands = event.registrar();
             commands.register(
-                    Commands.literal("loadscript")
-                            .then(Commands.argument("filename", StringArgumentType.word())
-                                    .executes(this::loadScript))
-                            .build(),
-                    "Load a Lua script by name");
-
+                Commands.literal("loadscript")
+                    .then(Commands.argument("filename", StringArgumentType.word())
+                        .suggests((context, builder) -> {
+                            File luaDir = new File(getServer().getWorldContainer(), "lua");
+                            if (luaDir.exists() && luaDir.isDirectory()) {
+                                for (File file : luaDir.listFiles((dir, name) -> name.endsWith(".lua"))) {
+                                    String scriptName = file.getName().replace(".lua", "");
+                                    builder.suggest(scriptName);
+                                }
+                            }
+                            return builder.buildFuture();
+                        })
+                        .executes(this::loadScript))
+                    .build()
+            );            
             commands.register(
                     Commands.literal("listscripts")
                             .executes(this::listScripts)

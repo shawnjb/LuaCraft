@@ -3,8 +3,8 @@ package com.shawnjb.luacraft;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
@@ -13,8 +13,17 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 import com.shawnjb.luacraft.lib.LuaCraftLibrary;
 import com.shawnjb.luacraft.utils.Undumper;
 import com.shawnjb.luacraft.utils.Vec3;
+
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import java.io.*;
-import java.util.*;
 
 public class LuaCraft extends JavaPlugin {
     private Globals globals;
@@ -33,6 +42,91 @@ public class LuaCraft extends JavaPlugin {
         luaCraftLibrary.registerFunctions(globals);
         Vec3.registerVec3(globals);
         globals.get("print").call(LuaValue.valueOf("Vec3 module registered."));
+
+        // Register commands using Paper's Brigadier system
+        LifecycleEventManager<Plugin> manager = this.getLifecycleManager();
+        manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            var commands = event.registrar();
+            commands.register(
+                    Commands.literal("loadscript")
+                            .then(Commands.argument("filename", StringArgumentType.word())
+                                    .executes(this::loadScript))
+                            .build(),
+                    "Load a Lua script by name");
+
+            commands.register(
+                    Commands.literal("listscripts")
+                            .executes(this::listScripts)
+                            .build(),
+                    "List all available Lua scripts");
+        });
+    }
+
+    private int loadScript(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        CommandSourceStack sourceStack = context.getSource();
+        CommandSender sender = sourceStack.getSender();
+        lastSender = sender;
+        String scriptName = StringArgumentType.getString(context, "filename");
+
+        Component prefix = Component.text("[LuaCraft] ").color(NamedTextColor.LIGHT_PURPLE);
+        File scriptFile = new File(getServer().getWorldContainer(), "lua/" + scriptName + ".lua");
+
+        if (scriptFile.exists()) {
+            try {
+                globals.set("script", LuaValue.tableOf(new LuaValue[] {
+                        LuaValue.valueOf("name"), LuaValue.valueOf(scriptFile.getName())
+                }));
+
+                LuaValue chunk = globals.loadfile(scriptFile.getAbsolutePath());
+                chunk.call();
+                lastSender.sendMessage(
+                        prefix.append(Component.text("Script loaded successfully: ").color(NamedTextColor.GREEN)
+                                .append(Component.text(scriptName).color(NamedTextColor.AQUA)
+                                        .decorate(TextDecoration.ITALIC))));
+            } catch (LuaError e) {
+                lastSender.sendMessage(prefix
+                        .append(Component.text("Error executing script: " + e.getMessage()).color(NamedTextColor.RED)));
+            }
+        } else {
+            lastSender.sendMessage(prefix.append(Component.text("Script not found: ").color(NamedTextColor.RED)
+                    .append(Component.text(scriptName).color(NamedTextColor.RED).decorate(TextDecoration.ITALIC))));
+        }
+        return 1;
+    }
+
+    private int listScripts(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack sourceStack = context.getSource();
+        CommandSender sender = sourceStack.getSender();
+
+        Component prefix = Component.text("[LuaCraft] ").color(NamedTextColor.LIGHT_PURPLE);
+
+        File folder = new File(getServer().getWorldContainer(), "lua");
+        if (!folder.exists() || !folder.isDirectory()) {
+            sender.sendMessage(
+                    prefix.append(Component.text("Lua scripts directory does not exist.").color(NamedTextColor.RED)));
+            return 1;
+        }
+
+        String[] luaFiles = folder.list((dir, name) -> name.endsWith(".lua"));
+        if (luaFiles == null || luaFiles.length == 0) {
+            sender.sendMessage(prefix.append(Component.text("No Lua scripts found.").color(NamedTextColor.RED)));
+            return 1;
+        }
+
+        Component scriptsList = Component.text("Available scripts: ").color(NamedTextColor.GREEN);
+        for (int i = 0; i < luaFiles.length; i++) {
+            String scriptNameStr = luaFiles[i].substring(0, luaFiles[i].lastIndexOf('.'));
+            Component scriptName = Component.text(scriptNameStr).color(NamedTextColor.AQUA)
+                    .decorate(TextDecoration.ITALIC);
+
+            scriptsList = scriptsList.append(scriptName);
+            if (i < luaFiles.length - 1) {
+                scriptsList = scriptsList.append(Component.text(", ").color(NamedTextColor.GREEN));
+            }
+        }
+
+        sender.sendMessage(prefix.append(scriptsList));
+        return 1;
     }
 
     private void registerAutorunScripts(File luaDir) {
@@ -76,7 +170,7 @@ public class LuaCraft extends JavaPlugin {
                             targetFile.getParentFile().mkdirs();
 
                             try (InputStream in = getResource(entryName);
-                                 OutputStream out = new FileOutputStream(targetFile)) {
+                                    OutputStream out = new FileOutputStream(targetFile)) {
                                 byte[] buffer = new byte[1024];
                                 int length;
                                 while ((length = in.read(buffer)) > 0) {
@@ -91,102 +185,5 @@ public class LuaCraft extends JavaPlugin {
         } catch (Exception e) {
             getLogger().severe("Failed to copy resource directory: " + e.getMessage());
         }
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        lastSender = sender;
-
-        Component prefix = Component.text("[LuaCraft] ").color(NamedTextColor.LIGHT_PURPLE);
-
-        if (cmd.getName().equalsIgnoreCase("loadscript")) {
-            if (args.length == 0) {
-                sender.sendMessage(prefix.append(Component.text("Usage: /loadscript <filename>").color(NamedTextColor.RED)));
-                return true;
-            }
-
-            File scriptFile = new File(getServer().getWorldContainer(), "lua/" + args[0] + ".lua");
-
-            if (scriptFile.exists()) {
-                try {
-                    globals.set("script", LuaValue.tableOf(new LuaValue[] {
-                            LuaValue.valueOf("name"), LuaValue.valueOf(scriptFile.getName())
-                    }));
-
-                    LuaValue chunk = globals.loadfile(scriptFile.getAbsolutePath());
-                    chunk.call();
-                } catch (LuaError e) {
-                    sender.sendMessage(prefix.append(Component.text("Error executing script: " + e.getMessage())
-                            .color(NamedTextColor.RED)));
-                }
-            } else {
-                sender.sendMessage(prefix.append(Component.text("Script not found: ").color(NamedTextColor.RED)
-                        .append(Component.text(args[0]).color(NamedTextColor.RED).decorate(TextDecoration.ITALIC))));
-            }
-            return true;
-        }
-
-        if (cmd.getName().equalsIgnoreCase("listscripts")) {
-            listScripts(sender, prefix);
-            return true;
-        }
-
-        return false;
-    }
-
-    private void listScripts(CommandSender sender, Component prefix) {
-        File folder = new File(getServer().getWorldContainer(), "lua");
-        if (!folder.exists() || !folder.isDirectory()) {
-            sender.sendMessage(prefix.append(Component.text("Lua scripts directory does not exist.").color(NamedTextColor.RED)));
-            return;
-        }
-
-        String[] luaFiles = folder.list((dir, name) -> name.endsWith(".lua"));
-        if (luaFiles == null || luaFiles.length == 0) {
-            sender.sendMessage(prefix.append(Component.text("No Lua scripts found.").color(NamedTextColor.RED)));
-            return;
-        }
-
-        Component scriptsList = Component.text("Available scripts: ").color(NamedTextColor.GREEN);
-
-        for (int i = 0; i < luaFiles.length; i++) {
-            String scriptNameStr = luaFiles[i].substring(0, luaFiles[i].lastIndexOf('.'));
-            Component scriptName = Component.text(scriptNameStr).color(NamedTextColor.AQUA).decorate(TextDecoration.ITALIC);
-
-            scriptsList = scriptsList.append(scriptName);
-
-            if (i < luaFiles.length - 1) {
-                scriptsList = scriptsList.append(Component.text(", ").color(NamedTextColor.GREEN));
-            }
-        }
-
-        sender.sendMessage(prefix.append(scriptsList));
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (command.getName().equalsIgnoreCase("loadscript") && args.length == 1) {
-            File folder = new File(getServer().getWorldContainer(), "lua");
-
-            if (!folder.exists() || !folder.isDirectory()) {
-                return null;
-            }
-            String[] luaFiles = folder.list((dir, name) -> name.endsWith(".lua"));
-            List<String> completions = new ArrayList<>();
-
-            if (luaFiles != null) {
-                for (String fileName : luaFiles) {
-                    completions.add(fileName.substring(0, fileName.lastIndexOf('.')));
-                }
-            }
-
-            return completions;
-        }
-
-        if (command.getName().equalsIgnoreCase("listscripts")) {
-            return List.of();
-        }
-
-        return null;
     }
 }

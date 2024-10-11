@@ -300,8 +300,7 @@ public class LuaCraftLibrary {
 
 					LuaValue position = dataTable.get("position");
 					if (!position.isnil() && position.istable()) {
-						Vec3 vec3Position = Vec3.fromLua(position);
-						luaCraftEntity.setPosition(vec3Position.x, vec3Position.y, vec3Position.z);
+						luaCraftEntity.setPosition(Vec3.fromLua(position));
 					}
 
 					LuaValue charged = dataTable.get("charged");

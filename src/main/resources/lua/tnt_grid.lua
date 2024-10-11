@@ -15,5 +15,3 @@ for x = -gridSize, gridSize do
         end
     end
 end
-
-LuaCraft.print("TNT grid spawned around your position!")

@@ -231,8 +231,7 @@ public class LuaCraftLibrary {
 				try {
 					entityType = EntityType.valueOf(entityName.toUpperCase());
 				} catch (IllegalArgumentException e) {
-					plugin.getLastSender()
-							.sendMessage(TextFormatter.translateColorCodes("Invalid entity type: " + entityName));
+					plugin.getLastSender().sendMessage(TextFormatter.translateColorCodes("Invalid entity type: " + entityName));
 					return LuaValue.NIL;
 				}
 
@@ -240,13 +239,9 @@ public class LuaCraftLibrary {
 					Player player = (Player) plugin.getLastSender();
 					Location location = new Location(player.getWorld(), position.x, position.y, position.z);
 					Entity entity = player.getWorld().spawnEntity(location, entityType);
-					plugin.getLastSender().sendMessage(TextFormatter
-							.translateColorCodes("Summoned " + entityName + " at (" + position.x + ", " + position.y
-									+ ", " + position.z + ")."));
 					return LuaValue.valueOf(entity.getUniqueId().toString());
 				} else {
-					plugin.getLastSender()
-							.sendMessage(TextFormatter.translateColorCodes("You must be a player to summon entities."));
+					plugin.getLastSender().sendMessage(TextFormatter.translateColorCodes("You must be a player to summon entities."));
 				}
 
 				return LuaValue.NIL;

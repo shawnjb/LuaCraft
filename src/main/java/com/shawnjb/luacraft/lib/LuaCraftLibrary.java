@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.shawnjb.luacraft.LuaCraft;
+import com.shawnjb.luacraft.utils.TextFormatter;
 import com.shawnjb.luacraft.utils.Vec3;
 
 import io.papermc.paper.registry.RegistryAccess;
@@ -104,7 +105,7 @@ public class LuaCraftLibrary {
                     message.append(args.checkjstring(i)).append(" ");
                 }
 
-                Component chatMessage = plugin.toHexColors(message.toString().trim());
+                Component chatMessage = TextFormatter.toHexColors(message.toString().trim());
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.sendMessage(chatMessage);
@@ -122,7 +123,7 @@ public class LuaCraftLibrary {
                     message.append(args.checkjstring(i)).append(" ");
                 }
 
-                Component chatMessage = plugin.toHexColors(message.toString().trim());
+                Component chatMessage = TextFormatter.toHexColors(message.toString().trim());
                 Bukkit.getLogger().info("[LuaCraft Broadcast] " + message.toString().trim());
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -175,7 +176,7 @@ public class LuaCraftLibrary {
                     Bukkit.dispatchCommand(player, command);
                 } else {
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("You must be a player to run commands."));
+                            .sendMessage(TextFormatter.translateColorCodes("You must be a player to run commands."));
                 }
                 return LuaValue.NIL;
             }
@@ -199,7 +200,7 @@ public class LuaCraftLibrary {
                     return positionTable;
                 } else {
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("You must be a player to get position."));
+                            .sendMessage(TextFormatter.translateColorCodes("You must be a player to get position."));
                 }
                 return LuaValue.NIL;
             }
@@ -218,7 +219,7 @@ public class LuaCraftLibrary {
                     player.teleport(new Location(player.getWorld(), x, y, z));
                 } else {
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("You must be a player to set position."));
+                            .sendMessage(TextFormatter.translateColorCodes("You must be a player to set position."));
                 }
                 return LuaValue.NIL;
             }
@@ -237,7 +238,7 @@ public class LuaCraftLibrary {
                     entityType = EntityType.valueOf(entityName.toUpperCase());
                 } catch (IllegalArgumentException e) {
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("Invalid entity type: " + entityName));
+                            .sendMessage(TextFormatter.translateColorCodes("Invalid entity type: " + entityName));
                     return LuaValue.NIL;
                 }
 
@@ -245,12 +246,12 @@ public class LuaCraftLibrary {
                     Player player = (Player) plugin.getLastSender();
                     Location location = new Location(player.getWorld(), x, y, z);
                     Entity entity = player.getWorld().spawnEntity(location, entityType);
-                    plugin.getLastSender().sendMessage(plugin
+                    plugin.getLastSender().sendMessage(TextFormatter
                             .translateColorCodes("Summoned " + entityName + " at (" + x + ", " + y + ", " + z + ")."));
                     return LuaValue.valueOf(entity.getUniqueId().toString());
                 } else {
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("You must be a player to summon entities."));
+                            .sendMessage(TextFormatter.translateColorCodes("You must be a player to summon entities."));
                 }
 
                 return LuaValue.NIL;
@@ -272,7 +273,7 @@ public class LuaCraftLibrary {
                     return entitiesTable;
                 } else {
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("You must be a player to get entity data."));
+                            .sendMessage(TextFormatter.translateColorCodes("You must be a player to get entity data."));
                 }
 
                 return LuaValue.NIL;
@@ -359,7 +360,7 @@ public class LuaCraftLibrary {
                         LuaValue customName = itemData.get("name");
                         if (customName.isstring()) {
                             plugin.getLogger().info("Setting custom name: " + customName.tojstring());
-                            Component coloredName = plugin.toHexColors(customName.tojstring());
+                            Component coloredName = TextFormatter.toHexColors(customName.tojstring());
                             meta.displayName(coloredName);
                         }
 
@@ -371,7 +372,7 @@ public class LuaCraftLibrary {
                             LuaValue loreKey = LuaValue.NIL;
                             while ((loreKey = loreTable.next(loreKey).arg1()).isnil() == false) {
                                 String loreLine = loreTable.get(loreKey).tojstring();
-                                Component coloredLoreLine = plugin.toHexColors(loreLine);
+                                Component coloredLoreLine = TextFormatter.toHexColors(loreLine);
                                 loreList.add(coloredLoreLine);
                                 plugin.getLogger().info("Lore line added: " + loreLine);
                             }
@@ -416,7 +417,7 @@ public class LuaCraftLibrary {
                         return LuaValue.userdataOf(itemStack);
                     } else {
                         plugin.getLastSender()
-                                .sendMessage(plugin.translateColorCodes("Invalid material: " + materialName));
+                                .sendMessage(TextFormatter.translateColorCodes("Invalid material: " + materialName));
                         plugin.getLogger().warning("Invalid material: " + materialName);
                     }
                 } else {
@@ -441,7 +442,7 @@ public class LuaCraftLibrary {
                     return LuaValue.valueOf(blockType.name());
                 } else {
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("You must be a player to get block type."));
+                            .sendMessage(TextFormatter.translateColorCodes("You must be a player to get block type."));
                 }
                 return LuaValue.NIL;
             }
@@ -456,18 +457,20 @@ public class LuaCraftLibrary {
 
                     if (inputSpeed < 1.0f || inputSpeed > 10.0f) {
                         plugin.getLastSender()
-                                .sendMessage(plugin.translateColorCodes("Speed must be between &91&f and &910&f"));
+                                .sendMessage(
+                                        TextFormatter.translateColorCodes("Speed must be between &91&f and &910&f"));
                         return LuaValue.NIL;
                     }
 
                     float scaledSpeed = inputSpeed / 10.0f;
 
                     player.setWalkSpeed(scaledSpeed);
-                    plugin.getLastSender().sendMessage(plugin.translateColorCodes("Player speed set to " + inputSpeed));
+                    plugin.getLastSender()
+                            .sendMessage(TextFormatter.translateColorCodes("Player speed set to " + inputSpeed));
                     return LuaValue.valueOf(inputSpeed);
                 } else {
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("You must be a player to set speed."));
+                            .sendMessage(TextFormatter.translateColorCodes("You must be a player to set speed."));
                 }
                 return LuaValue.NIL;
             }
@@ -482,7 +485,8 @@ public class LuaCraftLibrary {
 
                     if (inputSpeed < 1.0f || inputSpeed > 10.0f) {
                         plugin.getLastSender()
-                                .sendMessage(plugin.translateColorCodes("Flight speed must be between &91&f and &910&f"));
+                                .sendMessage(TextFormatter
+                                        .translateColorCodes("Flight speed must be between &91&f and &910&f"));
                         return LuaValue.NIL;
                     }
 
@@ -490,16 +494,17 @@ public class LuaCraftLibrary {
 
                     player.setFlySpeed(scaledSpeed);
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("Player flight speed set to " + inputSpeed));
+                            .sendMessage(TextFormatter.translateColorCodes("Player flight speed set to " + inputSpeed));
                     return LuaValue.valueOf(inputSpeed);
                 } else {
                     plugin.getLastSender()
-                            .sendMessage(plugin.translateColorCodes("You must be a player to set flight speed."));
+                            .sendMessage(
+                                    TextFormatter.translateColorCodes("You must be a player to set flight speed."));
                 }
                 return LuaValue.NIL;
             }
         });
-        
+
         globals.set("LuaCraft", table);
     }
 }

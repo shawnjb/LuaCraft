@@ -16,6 +16,46 @@ public class LuaCraftPlayer {
         this.player = player;
     }
 
+    public LuaValue toLuaValue() {
+        LuaValue playerTable = LuaValue.tableOf();
+
+        playerTable.set("giveItem", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                giveItem(args.checkjstring(1), args.checkint(2));
+                return LuaValue.NIL;
+            }
+        });
+
+        playerTable.set("sendMessage", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                sendMessage(args.checkjstring(1));
+                return LuaValue.NIL;
+            }
+        });
+
+        playerTable.set("getPosition", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                return getPosition();
+            }
+        });
+
+        playerTable.set("setPosition", new VarArgFunction() {
+            @Override
+            public Varargs invoke(Varargs args) {
+                setPosition(args.checkdouble(1), args.checkdouble(2), args.checkdouble(3));
+                return LuaValue.NIL;
+            }
+        });
+
+        playerTable.set("getName", LuaValue.valueOf(player.getName()));
+        playerTable.set("isOnline", LuaValue.valueOf(player.isOnline()));
+
+        return playerTable;
+    }
+
     public void sendMessage(String message) {
         player.sendMessage(message);
     }
@@ -33,82 +73,17 @@ public class LuaCraftPlayer {
         player.teleport(new Location(player.getWorld(), x, y, z));
     }
 
-    public String getName() {
-        return player.getName();
-    }
-
-    public boolean isOnline() {
-        return player.isOnline();
-    }
-
-    public VarArgFunction giveItem = new VarArgFunction() {
-        @Override
-        public Varargs invoke(Varargs args) {
-            String itemName = args.checkjstring(1);
-            int amount = args.checkint(2);
-            giveItem(itemName, amount);
-            return LuaValue.NIL;
-        }
-    };
-
     public void giveItem(String itemName, int amount) {
         Material material = Material.getMaterial(itemName.toUpperCase());
         if (material != null) {
-            ItemStack itemStack = new ItemStack(material, amount);
-            player.getInventory().addItem(itemStack);
-            player.sendMessage("You have received " + amount + " " + itemName + "(s).");
+            player.getInventory().addItem(new ItemStack(material, amount));
+            player.sendMessage("You received " + amount + " " + itemName + "(s).");
         } else {
-            player.sendMessage("Invalid item name: " + itemName);
+            player.sendMessage("Invalid item: " + itemName);
         }
     }
 
     public void runCommand(String command) {
         Bukkit.dispatchCommand(player, command);
-    }
-
-    public LuaValue toLuaValue() {
-        LuaValue playerTable = LuaValue.tableOf();
-        
-        playerTable.set("giveItem", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                String itemName = args.checkjstring(1);
-                int amount = args.checkint(2);
-                giveItem(itemName, amount);
-                return LuaValue.NIL;
-            }
-        });
-
-        playerTable.set("sendMessage", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                String message = args.checkjstring(1);
-                sendMessage(message);
-                return LuaValue.NIL;
-            }
-        });
-
-        playerTable.set("getPosition", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                return getPosition();
-            }
-        });
-
-        playerTable.set("setPosition", new VarArgFunction() {
-            @Override
-            public Varargs invoke(Varargs args) {
-                double x = args.checkdouble(1);
-                double y = args.checkdouble(2);
-                double z = args.checkdouble(3);
-                setPosition(x, y, z);
-                return LuaValue.NIL;
-            }
-        });
-
-        playerTable.set("getName", LuaValue.valueOf(getName()));
-        playerTable.set("isOnline", LuaValue.valueOf(isOnline()));
-
-        return playerTable;
     }
 }

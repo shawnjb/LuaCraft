@@ -3,95 +3,102 @@
 --- @class LuaCraftScript
 --- Represents the currently executing script. Use this class to obtain details about the running script.
 script = {
-    --- The script's name.
-    --- @type string
-    name = ''
+	--- The script's name.
+	--- @type string
+	name = ''
 }
 
 --- @class Vec3
 --- Represents a 3D vector with x, y, z coordinates, providing methods for common vector operations.
-local Vec3 = {
-    --- Adds another vector to this vector.
-    --- @param vec3 Vec3 The other vector to add.
-    --- @return Vec3 @A new vector resulting from the addition.
-    --- ```lua
-    --- local vec1 = Vec3.new(1, 2, 3)
-    --- local vec2 = Vec3.new(4, 5, 6)
-    --- local result = vec1:add(vec2)
-    --- print(result.x, result.y, result.z)  -- 5, 7, 9
-    --- ```
-    add = function(self, vec3) end,
+Vec3 = {
+	--- @type number
+	x = 0,
+	--- @type number
+	y = 0,
+	--- @type number
+	z = 0,
 
-    --- Subtracts another vector from this vector.
-    --- @param vec3 Vec3 The other vector to subtract.
-    --- @return Vec3 @A new vector resulting from the subtraction.
-    --- ```lua
-    --- local result = vec1:subtract(vec2)
-    --- print(result.x, result.y, result.z)  -- -3, -3, -3
-    --- ```
-    subtract = function(self, vec3) end,
+	--- Adds another vector to this vector.
+	--- @param vec3 Vec3 The other vector to add.
+	--- @return Vec3 @A new vector resulting from the addition.
+	--- ```lua
+	--- local vec1 = Vec3.new(1, 2, 3)
+	--- local vec2 = Vec3.new(4, 5, 6)
+	--- local result = vec1:add(vec2)
+	--- print(result.x, result.y, result.z)  -- 5, 7, 9
+	--- ```
+	add = function(self, vec3) end,
 
-    --- Multiplies this vector by a scalar value.
-    --- @param scalar number The scalar to multiply the vector by.
-    --- @return Vec3 @A new vector resulting from the multiplication.
-    --- ```lua
-    --- local result = vec1:multiply(2)
-    --- print(result.x, result.y, result.z)  -- 2, 4, 6
-    --- ```
-    multiply = function(self, scalar) end,
+	--- Subtracts another vector from this vector.
+	--- @param vec3 Vec3 The other vector to subtract.
+	--- @return Vec3 @A new vector resulting from the subtraction.
+	--- ```lua
+	--- local result = vec1:subtract(vec2)
+	--- print(result.x, result.y, result.z)  -- -3, -3, -3
+	--- ```
+	subtract = function(self, vec3) end,
 
-    --- Calculates the dot product of this vector and another vector.
-    --- @param vec3 Vec3 The other vector.
-    --- @return number @The dot product of the two vectors.
-    --- ```lua
-    --- local dot = vec1:dot(vec2)
-    --- print(dot)  -- 32
-    --- ```
-    dot = function(self, vec3) end,
+	--- Multiplies this vector by a scalar value.
+	--- @param scalar number The scalar to multiply the vector by.
+	--- @return Vec3 @A new vector resulting from the multiplication.
+	--- ```lua
+	--- local result = vec1:multiply(2)
+	--- print(result.x, result.y, result.z)  -- 2, 4, 6
+	--- ```
+	multiply = function(self, scalar) end,
 
-    --- Calculates the cross product of this vector and another vector.
-    --- @param vec3 Vec3 The other vector.
-    --- @return Vec3 @A new vector resulting from the cross product.
-    --- ```lua
-    --- local result = vec1:cross(vec2)
-    --- print(result.x, result.y, result.z)  -- -3, 6, -3
-    --- ```
-    cross = function(self, vec3) end,
+	--- Calculates the dot product of this vector and another vector.
+	--- @param vec3 Vec3 The other vector.
+	--- @return number @The dot product of the two vectors.
+	--- ```lua
+	--- local dot = vec1:dot(vec2)
+	--- print(dot)  -- 32
+	--- ```
+	dot = function(self, vec3) end,
 
-    --- Normalizes this vector (returns a unit vector in the same direction).
-    --- @return Vec3 @A new normalized vector.
-    --- ```lua
-    --- local normalized = vec1:normalize()
-    --- print(normalized.x, normalized.y, normalized.z)
-    --- ```
-    normalize = function(self) end,
+	--- Calculates the cross product of this vector and another vector.
+	--- @param vec3 Vec3 The other vector.
+	--- @return Vec3 @A new vector resulting from the cross product.
+	--- ```lua
+	--- local result = vec1:cross(vec2)
+	--- print(result.x, result.y, result.z)  -- -3, 6, -3
+	--- ```
+	cross = function(self, vec3) end,
 
-    --- Calculates the magnitude (length) of this vector.
-    --- @return number @The magnitude of the vector.
-    --- ```lua
-    --- local mag = vec1:magnitude()
-    --- print(mag)  -- 3.74...
-    --- ```
-    magnitude = function(self) end,
+	--- Normalizes this vector (returns a unit vector in the same direction).
+	--- @return Vec3 @A new normalized vector.
+	--- ```lua
+	--- local normalized = vec1:normalize()
+	--- print(normalized.x, normalized.y, normalized.z)
+	--- ```
+	normalize = function(self) end,
 
-    --- Calculates the distance between this vector and another vector.
-    --- @param vec3 Vec3 The other vector.
-    --- @return number @The distance between the two vectors.
-    --- ```lua
-    --- local distance = vec1:distance(vec2)
-    --- print(distance)  -- 5.19...
-    --- ```
-    distance = function(self, vec3) end,
+	--- Calculates the magnitude (length) of this vector.
+	--- @return number @The magnitude of the vector.
+	--- ```lua
+	--- local mag = vec1:magnitude()
+	--- print(mag)  -- 3.74...
+	--- ```
+	magnitude = function(self) end,
 
-    --- Performs linear interpolation between this vector and another vector.
-    --- @param vec3 Vec3 The target vector.
-    --- @param t number The interpolation factor (between 0 and 1).
-    --- @return Vec3 @A new vector resulting from the interpolation.
-    --- ```lua
-    --- local result = vec1:lerp(vec2, 0.5)
-    --- print(result.x, result.y, result.z)  -- 2.5, 3.5, 4.5
-    --- ```
-    lerp = function(self, vec3, t) end,
+	--- Calculates the distance between this vector and another vector.
+	--- @param vec3 Vec3 The other vector.
+	--- @return number @The distance between the two vectors.
+	--- ```lua
+	--- local distance = vec1:distance(vec2)
+	--- print(distance)  -- 5.19...
+	--- ```
+	distance = function(self, vec3) end,
+
+	--- Performs linear interpolation between this vector and another vector.
+	--- @param vec3 Vec3 The target vector.
+	--- @param t number The interpolation factor (between 0 and 1).
+	--- @return Vec3 @A new vector resulting from the interpolation.
+	--- ```lua
+	--- local result = vec1:lerp(vec2, 0.5)
+	--- print(result.x, result.y, result.z)  -- 2.5, 3.5, 4.5
+	--- ```
+	lerp = function(self, vec3, t) end,
 }
 
 --- Creates a new vector.
@@ -107,224 +114,224 @@ function Vec3.new(x, y, z) end
 --- @class LuaCraftItem
 --- Represents an item in the game, allowing Lua scripts to interact with its metadata and modify its attributes.
 local LuaCraftItem = {
-    --- Retrieves the metadata of the item, including name, lore, enchantments, and type.
-    --- @return table @A table containing metadata fields like `name`, `lore`, `enchantments`, `type`, and `amount`.
-    --- ```lua
-    --- local metadata = item.getItemMetadata()
-    --- print(metadata.name, metadata.lore[1], metadata.enchantments["sharpness"], metadata.type)
-    --- ```
-    getItemMetadata = function() end,
+	--- Retrieves the metadata of the item, including name, lore, enchantments, and type.
+	--- @return table @A table containing metadata fields like `name`, `lore`, `enchantments`, `type`, and `amount`.
+	--- ```lua
+	--- local metadata = item.getItemMetadata()
+	--- print(metadata.name, metadata.lore[1], metadata.enchantments["sharpness"], metadata.type)
+	--- ```
+	getItemMetadata = function() end,
 
-    --- Sets the display name of the item.
-    --- @param displayName string The custom name to set for the item.
-    --- ```lua
-    --- item.setDisplayName("Legendary Sword")
-    --- ```
-    setDisplayName = function(displayName) end,
+	--- Sets the display name of the item.
+	--- @param displayName string The custom name to set for the item.
+	--- ```lua
+	--- item.setDisplayName("Legendary Sword")
+	--- ```
+	setDisplayName = function(displayName) end,
 
-    --- Sets the lore (description) of the item.
-    --- @param lore table A table of strings representing the item's lore.
-    --- ```lua
-    --- item.setLore({ "Forged in the fires of the nether", "Unbreakable" })
-    --- ```
-    setLore = function(lore) end,
+	--- Sets the lore (description) of the item.
+	--- @param lore table A table of strings representing the item's lore.
+	--- ```lua
+	--- item.setLore({ "Forged in the fires of the nether", "Unbreakable" })
+	--- ```
+	setLore = function(lore) end,
 
-    --- Adds a safe enchantment to the item, ensuring valid enchantments and levels.
-    --- @param enchantmentName string The name of the enchantment (e.g., "sharpness").
-    --- @param level number The level of the enchantment (must be within valid bounds).
-    --- ```lua
-    --- item.addSafeEnchantment("sharpness", 5)
-    --- ```
-    addSafeEnchantment = function(enchantmentName, level) end,
+	--- Adds a safe enchantment to the item, ensuring valid enchantments and levels.
+	--- @param enchantmentName string The name of the enchantment (e.g., "sharpness").
+	--- @param level number The level of the enchantment (must be within valid bounds).
+	--- ```lua
+	--- item.addSafeEnchantment("sharpness", 5)
+	--- ```
+	addSafeEnchantment = function(enchantmentName, level) end,
 
-    --- Removes an enchantment from the item if it exists.
-    --- @param enchantmentName string The name of the enchantment to remove (e.g., "sharpness").
-    --- ```lua
-    --- item.removeSafeEnchantment("sharpness")
-    --- ```
-    removeSafeEnchantment = function(enchantmentName) end,
+	--- Removes an enchantment from the item if it exists.
+	--- @param enchantmentName string The name of the enchantment to remove (e.g., "sharpness").
+	--- ```lua
+	--- item.removeSafeEnchantment("sharpness")
+	--- ```
+	removeSafeEnchantment = function(enchantmentName) end,
 
-    --- Sets custom model data for the item.
-    --- @param data number The custom model data value to set.
-    --- ```lua
-    --- item.setCustomModelData(123456)
-    --- ```
-    setCustomModelData = function(data) end,
+	--- Sets custom model data for the item.
+	--- @param data number The custom model data value to set.
+	--- ```lua
+	--- item.setCustomModelData(123456)
+	--- ```
+	setCustomModelData = function(data) end,
 
-    --- Sets a persistent string-based value on the item using a key.
-    --- @param key string The key to store the data under.
-    --- @param value string The string value to store.
-    --- ```lua
-    --- item.setPersistentData("owner", "Player123")
-    --- ```
-    setPersistentData = function(key, value) end,
+	--- Sets a persistent string-based value on the item using a key.
+	--- @param key string The key to store the data under.
+	--- @param value string The string value to store.
+	--- ```lua
+	--- item.setPersistentData("owner", "Player123")
+	--- ```
+	setPersistentData = function(key, value) end,
 
-    --- Retrieves a persistent string-based value stored on the item.
-    --- @param key string The key to retrieve the data from.
-    --- @return string|nil @The stored value, or nil if not set.
-    --- ```lua
-    --- local owner = item.getPersistentData("owner")
-    --- if owner then
-    ---     print("This item belongs to:", owner)
-    --- end
-    --- ```
-    getPersistentData = function(key) end,
+	--- Retrieves a persistent string-based value stored on the item.
+	--- @param key string The key to retrieve the data from.
+	--- @return string|nil @The stored value, or nil if not set.
+	--- ```lua
+	--- local owner = item.getPersistentData("owner")
+	--- if owner then
+	---     print("This item belongs to:", owner)
+	--- end
+	--- ```
+	getPersistentData = function(key) end,
 
-    --- Sets whether the item is unbreakable.
-    --- @param unbreakable boolean True to make the item unbreakable, false to make it breakable.
-    --- ```lua
-    --- item.setUnbreakable(true)
-    --- ```
-    setUnbreakable = function(unbreakable) end,
+	--- Sets whether the item is unbreakable.
+	--- @param unbreakable boolean True to make the item unbreakable, false to make it breakable.
+	--- ```lua
+	--- item.setUnbreakable(true)
+	--- ```
+	setUnbreakable = function(unbreakable) end,
 }
 
 --- @class LuaCraftItemData
 local LuaCraftItemData = {
-    --- @type LuaCraftPlayer
-    player = nil,
-    --- @type string
-    name = nil,
-    --- @type { [number]: string }
-    lore = {},
-    --- @type { [string]: number }
-    enchantments = {},
+	--- @type LuaCraftPlayer
+	player = nil,
+	--- @type string
+	name = nil,
+	--- @type { [number]: string }
+	lore = {},
+	--- @type { [string]: number }
+	enchantments = {},
 }
 
 --- @class LuaCraftPlayer
 --- Represents a player in the game, exposing methods to interact with the player.
 local LuaCraftPlayer = {
-    --- Sends a message to the player.
-    --- @param message string The message to send.
-    --- ```lua
-    --- player.sendMessage("Hello, Player!")
-    --- ```
-    sendMessage = function(message) end,
+	--- Sends a message to the player.
+	--- @param message string The message to send.
+	--- ```lua
+	--- player.sendMessage("Hello, Player!")
+	--- ```
+	sendMessage = function(message) end,
 
-    --- Retrieves the player's position as a Lua table with `x`, `y`, and `z` coordinates.
-    --- @return table @A table with `x`, `y`, and `z` fields representing the player's current position.
-    --- ```lua
-    --- local position = player.getPosition()
-    --- print(position.x, position.y, position.z)
-    --- ```
-    getPosition = function() end,
+	--- Retrieves the player's position as a Lua table with `x`, `y`, and `z` coordinates.
+	--- @return table @A table with `x`, `y`, and `z` fields representing the player's current position.
+	--- ```lua
+	--- local position = player.getPosition()
+	--- print(position.x, position.y, position.z)
+	--- ```
+	getPosition = function() end,
 
-    --- Teleports the player to the specified coordinates.
-    --- @param x number The X coordinate.
-    --- @param y number The Y coordinate.
-    --- @param z number The Z coordinate.
-    --- ```lua
-    --- player.setPosition(100, 64, 100)
-    --- ```
-    setPosition = function(x, y, z) end,
+	--- Teleports the player to the specified coordinates.
+	--- @param x number The X coordinate.
+	--- @param y number The Y coordinate.
+	--- @param z number The Z coordinate.
+	--- ```lua
+	--- player.setPosition(100, 64, 100)
+	--- ```
+	setPosition = function(x, y, z) end,
 
-    --- Gives an item to the player.
-    --- @param itemName string The name of the item to give.
-    --- @param amount number The quantity of the item.
-    --- ```lua
-    --- player.giveItem("DIAMOND", 5)
-    --- ```
-    giveItem = function(itemName, amount) end,
+	--- Gives an item to the player.
+	--- @param itemName string The name of the item to give.
+	--- @param amount number The quantity of the item.
+	--- ```lua
+	--- player.giveItem("DIAMOND", 5)
+	--- ```
+	giveItem = function(itemName, amount) end,
 
-    --- Retrieves the player's name.
-    --- @return string @The name of the player.
-    --- ```lua
-    --- local name = player.getName()
-    --- print(name)
-    --- ```
-    getName = function() end,
+	--- Retrieves the player's name.
+	--- @return string @The name of the player.
+	--- ```lua
+	--- local name = player.getName()
+	--- print(name)
+	--- ```
+	getName = function() end,
 
-    --- Checks if the player is online.
-    --- @return boolean @True if the player is online, false otherwise.
-    --- ```lua
-    --- local online = player.isOnline()
-    --- print(online)
-    --- ```
-    isOnline = function() end
+	--- Checks if the player is online.
+	--- @return boolean @True if the player is online, false otherwise.
+	--- ```lua
+	--- local online = player.isOnline()
+	--- print(online)
+	--- ```
+	isOnline = function() end
 }
 
 --- @class LuaCraftEntity
 --- Represents an entity in the Minecraft world. This class provides methods to interact with and manipulate the entity's attributes.
 local LuaCraftEntity = {
-    --- Retrieves the entity's position as a Lua table with `x`, `y`, and `z` coordinates.
-    --- @return table @A table with `x`, `y`, and `z` fields representing the entity's current position.
-    --- ```lua
-    --- local position = entity.getPosition()
-    --- print(position.x, position.y, position.z)
-    --- ```
-    getPosition = function() end,
+	--- Retrieves the entity's position as a Lua table with `x`, `y`, and `z` coordinates.
+	--- @return table @A table with `x`, `y`, and `z` fields representing the entity's current position.
+	--- ```lua
+	--- local position = entity.getPosition()
+	--- print(position.x, position.y, position.z)
+	--- ```
+	getPosition = function() end,
 
-    --- Teleports the entity to the specified coordinates.
-    --- @param x number The X coordinate.
-    --- @param y number The Y coordinate.
-    --- @param z number The Z coordinate.
-    --- ```lua
-    --- entity.setPosition(100, 64, 100)
-    --- ```
-    setPosition = function(x, y, z) end,
+	--- Teleports the entity to the specified coordinates.
+	--- @param x number The X coordinate.
+	--- @param y number The Y coordinate.
+	--- @param z number The Z coordinate.
+	--- ```lua
+	--- entity.setPosition(100, 64, 100)
+	--- ```
+	setPosition = function(x, y, z) end,
 
-    --- Sets a custom name for the entity.
-    --- @param name string The custom name to set.
-    --- ```lua
-    --- entity.setCustomName("Boss Monster")
-    --- ```
-    setCustomName = function(name) end,
+	--- Sets a custom name for the entity.
+	--- @param name string The custom name to set.
+	--- ```lua
+	--- entity.setCustomName("Boss Monster")
+	--- ```
+	setCustomName = function(name) end,
 
-    --- @type string @The type of the entity *(e.g., "CREEPER", "ZOMBIE")*.
-    --- ```lua
-    --- print("Entity type:", entity.type)
-    --- ```
-    type = nil,
+	--- @type string @The type of the entity *(e.g., "CREEPER", "ZOMBIE")*.
+	--- ```lua
+	--- print("Entity type:", entity.type)
+	--- ```
+	type = nil,
 
-    --- Retrieves the entity's UUID as a string.
-    --- @return string @The UUID of the entity.
-    --- ```lua
-    --- local uuid = entity.getUUID()
-    --- print("Entity UUID:", uuid)
-    --- ```
-    getUUID = function() end,
+	--- Retrieves the entity's UUID as a string.
+	--- @return string @The UUID of the entity.
+	--- ```lua
+	--- local uuid = entity.getUUID()
+	--- print("Entity UUID:", uuid)
+	--- ```
+	getUUID = function() end,
 
-    --- Sets the health of the entity if it is a LivingEntity.
-    --- @param health number The health value to set.
-    --- ```lua
-    --- entity.setHealth(20)
-    --- ```
-    setHealth = function(health) end,
+	--- Sets the health of the entity if it is a LivingEntity.
+	--- @param health number The health value to set.
+	--- ```lua
+	--- entity.setHealth(20)
+	--- ```
+	setHealth = function(health) end,
 
-    --- Sets whether the entity is a baby (for ageable entities).
-    --- @param isBaby boolean True to set the entity as a baby, false to set it as an adult.
-    --- ```lua
-    --- entity.setBaby(true) -- Set entity to baby
-    --- entity.setBaby(false) -- Set entity to adult
-    --- ```
-    setBaby = function(isBaby) end,
+	--- Sets whether the entity is a baby (for ageable entities).
+	--- @param isBaby boolean True to set the entity as a baby, false to set it as an adult.
+	--- ```lua
+	--- entity.setBaby(true) -- Set entity to baby
+	--- entity.setBaby(false) -- Set entity to adult
+	--- ```
+	setBaby = function(isBaby) end,
 
-    --- Sets whether the entity (if it is a Creeper) is charged.
-    --- @param charged boolean True to charge the Creeper, false to discharge it.
-    --- ```lua
-    --- entity.setCharged(true) -- Charge the Creeper
-    --- entity.setCharged(false) -- Remove the charge from the Creeper
-    --- ```
-    setCharged = function(charged) end,
+	--- Sets whether the entity (if it is a Creeper) is charged.
+	--- @param charged boolean True to charge the Creeper, false to discharge it.
+	--- ```lua
+	--- entity.setCharged(true) -- Charge the Creeper
+	--- entity.setCharged(false) -- Remove the charge from the Creeper
+	--- ```
+	setCharged = function(charged) end,
 
-    --- Retrieves the custom name of the entity, or nil if not set.
-    --- @return string|nil @The custom name of the entity, or nil if not set.
-    --- ```lua
-    --- local customName = entity.getCustomName()
-    --- if customName then
-    ---     print("Entity custom name:", customName)
-    --- else
-    ---     print("Entity has no custom name.")
-    --- end
-    --- ```
-    getCustomName = function() end,
+	--- Retrieves the custom name of the entity, or nil if not set.
+	--- @return string|nil @The custom name of the entity, or nil if not set.
+	--- ```lua
+	--- local customName = entity.getCustomName()
+	--- if customName then
+	---     print("Entity custom name:", customName)
+	--- else
+	---     print("Entity has no custom name.")
+	--- end
+	--- ```
+	getCustomName = function() end,
 
-    --- Enables or disables the AI for the entity if it is a LivingEntity.
-    --- @param enabled boolean True to enable AI, false to disable it.
-    --- ```lua
-    --- entity.setAI(false) -- Disable AI
-    --- entity.setAI(true) -- Enable AI
-    --- ```
-    setAI = function(enabled) end,
+	--- Enables or disables the AI for the entity if it is a LivingEntity.
+	--- @param enabled boolean True to enable AI, false to disable it.
+	--- ```lua
+	--- entity.setAI(false) -- Disable AI
+	--- entity.setAI(true) -- Enable AI
+	--- ```
+	setAI = function(enabled) end,
 }
 
 --- @class LuaCraft

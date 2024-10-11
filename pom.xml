@@ -68,7 +68,7 @@
                                         <include>**/*.class</include>
                                         <include>**/*.lua</include>
                                         <include>*.lua</include>
-                                        <include>plugin.yml</include>
+                                        <include>paper-plugin.yml</include>
                                     </includes>
                                 </filter>
                             </filters>

@@ -32,7 +32,6 @@
                     <include>**/*.lua</include>
                     <include>*.lua</include>
                     <include>plugin.yml</include>
-                    <include>config.yml</include>
                   </includes>
                 </filter>
               </filters>

@@ -12,7 +12,6 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
 import com.shawnjb.luacraft.lib.LuaCraftLibrary;
 import com.shawnjb.luacraft.utils.Undumper;
-import com.shawnjb.luacraft.utils.Vec3;
 import com.shawnjb.luacraft.utils.Vec3Registrar;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;

@@ -11,12 +11,23 @@ script = {
 --- @class Vec3
 --- Represents a 3D vector with x, y, z coordinates, providing methods for common vector operations.
 Vec3 = {
-	--- @type number
-	x = 0,
-	--- @type number
-	y = 0,
-	--- @type number
-	z = 0,
+    --- @type number
+    x = 0,
+    --- @type number
+    y = 0,
+    --- @type number
+    z = 0,
+
+    --- Creates a new Vec3 object.
+	--- @param self Vec3 The main class.
+    --- @param x number The x-coordinate.
+    --- @param y number The y-coordinate.
+    --- @param z number The z-coordinate.
+    --- @return Vec3 @A new vector object.
+    --- ```lua
+    --- local vec = Vec3:new(1, 2, 3)
+    --- ```
+    new = function(self, x, y, z) end,
 
 	--- Adds another vector to this vector.
 	--- @param vec3 Vec3 The other vector to add.

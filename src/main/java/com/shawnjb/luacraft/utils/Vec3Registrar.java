@@ -2,8 +2,7 @@ package com.shawnjb.luacraft.utils;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.TwoArgFunction;
-import org.luaj.vm2.lib.VarArgFunction;
+import org.luaj.vm2.lib.ThreeArgFunction;
 
 /**
  * The Vec3Registrar class handles the registration of the Vec3 class in Lua.
@@ -18,9 +17,9 @@ public class Vec3Registrar {
 	 */
 	public static void registerVec3(Globals globals) {
 		LuaValue vec3Table = LuaValue.tableOf();
-		vec3Table.set("new", new VarArgFunction() {
+		vec3Table.set("new", new ThreeArgFunction() {
 			@Override
-			public LuaValue call(LuaValue self, LuaValue x, LuaValue y, LuaValue z) {
+			public LuaValue call(LuaValue x, LuaValue y, LuaValue z) {
 				return new Vec3(x.todouble(), y.todouble(), z.todouble()).toLua();
 			}
 		});

@@ -8,7 +8,7 @@ maven.buildMavenPackage rec {
   version = "1.1.3";
 
   src = ./.;
-  mvnHash = "sha256-kBdWkjsssuGkwawhPdwmeBhu81TSSDHACKFVGDl6lhk=";
+  mvnHash = "sha256-41Qt8dkSyP7uMU27UHmKAri/GiSBlxdbvuBdoRvouyc=";
 
   installPhase = ''
     runHook preInstall

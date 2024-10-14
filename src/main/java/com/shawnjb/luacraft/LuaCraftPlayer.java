@@ -1,4 +1,4 @@
-package com.shawnjb.luacraft.lib;
+package com.shawnjb.luacraft;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -54,7 +54,7 @@ public class LuaCraftPlayer {
             }
         });
 
-		playerTable.set("getName", LuaValue.valueOf(player.getName()));
+		playerTable.set("name", LuaValue.valueOf(player.getName()));
 		playerTable.set("isOnline", LuaValue.valueOf(player.isOnline()));
 
 		return playerTable;

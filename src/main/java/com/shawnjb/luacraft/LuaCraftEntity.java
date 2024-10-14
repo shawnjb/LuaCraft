@@ -1,4 +1,4 @@
-package com.shawnjb.luacraft.lib;
+package com.shawnjb.luacraft;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

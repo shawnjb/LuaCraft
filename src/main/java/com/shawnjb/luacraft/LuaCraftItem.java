@@ -1,4 +1,4 @@
-package com.shawnjb.luacraft.lib;
+package com.shawnjb.luacraft;
 
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;

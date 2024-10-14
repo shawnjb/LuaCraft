@@ -10,10 +10,7 @@ import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
-import com.shawnjb.luacraft.lib.LuaCraftLibrary;
-import com.shawnjb.luacraft.lib.LuaCraftWorld;
-import com.shawnjb.luacraft.lib.ReadFile;
-import com.shawnjb.luacraft.lib.WriteFile;
+
 import com.shawnjb.luacraft.utils.Undumper;
 import com.shawnjb.luacraft.utils.Vec3Registrar;
 
@@ -50,16 +47,10 @@ public class LuaCraft extends JavaPlugin {
 
 		// Initialize LuaCraftLibrary and register autorun scripts
 		LuaCraftLibrary luaCraftLibrary = new LuaCraftLibrary(this);
-		LuaCraftWorld luaCraftWorld = new LuaCraftWorld(this);
 		registerAutorunScripts(new File(getServer().getWorldContainer(), "lua"));
-
-		// Register global file I/O functions
-		WriteFile.registerGlobal(globals, this);
-		ReadFile.registerGlobal(globals, this);
 
 		// Register LuaCraft functions and Vec3 utility
 		luaCraftLibrary.registerLuaFunctions(globals);
-		luaCraftWorld.registerLuaFunctions(globals);
 		Vec3Registrar.registerVec3(globals);
 
 		// Register command handlers via LifecycleEventManager
@@ -133,8 +124,7 @@ public class LuaCraft extends JavaPlugin {
 
 		File folder = new File(getServer().getWorldContainer(), "lua");
 		if (!folder.exists() || !folder.isDirectory()) {
-			sender.sendMessage(
-					prefix.append(Component.text("Lua scripts directory does not exist.").color(NamedTextColor.RED)));
+			sender.sendMessage(prefix.append(Component.text("Lua scripts directory does not exist.").color(NamedTextColor.RED)));
 			return 1;
 		}
 
@@ -147,9 +137,7 @@ public class LuaCraft extends JavaPlugin {
 		Component scriptsList = Component.text("Available scripts: ").color(NamedTextColor.GREEN);
 		for (int i = 0; i < luaFiles.length; i++) {
 			String scriptNameStr = luaFiles[i].substring(0, luaFiles[i].lastIndexOf('.'));
-			Component scriptName = Component.text(scriptNameStr).color(NamedTextColor.AQUA)
-					.decorate(TextDecoration.ITALIC);
-
+			Component scriptName = Component.text(scriptNameStr).color(NamedTextColor.AQUA).decorate(TextDecoration.ITALIC);
 			scriptsList = scriptsList.append(scriptName);
 			if (i < luaFiles.length - 1) {
 				scriptsList = scriptsList.append(Component.text(", ").color(NamedTextColor.GREEN));
@@ -166,10 +154,7 @@ public class LuaCraft extends JavaPlugin {
 		if (autorunDir.exists()) {
 			for (File file : autorunDir.listFiles((dir, name) -> name.endsWith(".lua"))) {
 				try {
-					globals.set("script", LuaValue.tableOf(new LuaValue[] {
-							LuaValue.valueOf("name"), LuaValue.valueOf(file.getName())
-					}));
-
+					globals.set("script", LuaValue.tableOf(new LuaValue[] {LuaValue.valueOf("name"), LuaValue.valueOf(file.getName())}));
 					LuaValue chunk = globals.loadfile(file.getAbsolutePath());
 					chunk.call();
 				} catch (LuaError e) {

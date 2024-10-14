@@ -17,12 +17,14 @@ public class Vec3Registrar {
 	 */
 	public static void registerVec3(Globals globals) {
 		LuaValue vec3Table = LuaValue.tableOf();
+		
 		vec3Table.set("new", new ThreeArgFunction() {
 			@Override
 			public LuaValue call(LuaValue x, LuaValue y, LuaValue z) {
 				return new Vec3(x.todouble(), y.todouble(), z.todouble()).toLua();
 			}
 		});
+		
 		globals.set("Vec3", vec3Table);
 	}
 }

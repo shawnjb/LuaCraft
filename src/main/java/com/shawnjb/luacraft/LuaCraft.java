@@ -156,9 +156,11 @@ public class LuaCraft extends JavaPlugin {
 	}
 
 	private void copyResourceDirectoryToServer(String resourcePath, File targetDir) {
-		if (!targetDir.exists()) {
-			targetDir.mkdirs();
+		if (targetDir.exists()) {
+			getLogger().info("Lua directory already exists, skipping script regeneration.");
+			return;
 		}
+		targetDir.mkdirs();
 		try {
 			File jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
 			if (jarFile.isFile()) {

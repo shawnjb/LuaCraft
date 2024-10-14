@@ -480,3 +480,60 @@ function LuaCraft.setPlayerSpeed(speed) end
 --- LuaCraft.setPlayerFlightSpeed(10) -- Set flight speed to the maximum
 --- ```
 function LuaCraft.setPlayerFlightSpeed(speed) end
+
+--- @meta
+
+--- @class LuaCraftWorld
+--- Provides a system to bind Lua functions to various server events, allowing interaction with players and the world.
+LuaCraftWorld = {}
+
+--- Binds a Lua function to a specific server event.
+--- @param eventName string The name of the event to bind (e.g., "PlayerJoin", "PlayerQuit").
+--- @param callback function The Lua function to call when the event is triggered.
+--- @return LuaCraftWorldEvent @An event object that allows disconnecting the event later.
+--- ```lua
+--- LuaCraftWorld.bindEvent("PlayerJoin", function(player)
+---     print(player.getName .. " has joined the server!")
+--- end)
+--- ```
+function LuaCraftWorld.bindEvent(eventName, callback) end
+
+--- @class LuaCraftWorldEvent
+--- Represents an event that was previously bound, allowing it to be disconnected later.
+LuaCraftWorldEvent = {}
+
+--- Unbinds the previously bound event, stopping the Lua function from being called when the event triggers.
+--- ```lua
+--- local event = LuaCraftWorld.bindEvent("PlayerJoin", function(player)
+---     print(player.getName .. " has joined the server!")
+--- end)
+--- event.unbindEvent()  -- Disconnect the event listener
+--- ```
+function LuaCraftWorldEvent.unbindEvent() end
+
+--- Writes content to a file within the LuaCraft plugin's folder.
+--- @param filePath string The path to the file relative to the LuaCraft folder.
+--- @param content string The content to write to the file.
+--- @return boolean @Returns `true` if the file was successfully written, `false` otherwise.
+--- ```lua
+--- local success = writeFile("data/myfile.txt", "Hello, LuaCraft!")
+--- if success then
+---     print("File written successfully!")
+--- else
+---     print("Failed to write the file.")
+--- end
+--- ```
+function writeFile(filePath, content) end
+
+--- Reads content from a file within the LuaCraft plugin's folder.
+--- @param filePath string The path to the file relative to the LuaCraft folder.
+--- @return string? @Returns the content of the file, or `nil` if the file could not be read.
+--- ```lua
+--- local content = readFile("data/myfile.txt")
+--- if content then
+---     print("File content: " .. content)
+--- else
+---     print("Failed to read the file.")
+--- end
+--- ```
+function readFile(filePath) end

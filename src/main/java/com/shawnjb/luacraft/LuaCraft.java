@@ -37,6 +37,13 @@ public class LuaCraft extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		File luaCraftFolder = new File(getDataFolder(), "lua");
+		if (!luaCraftFolder.exists()) {
+			luaCraftFolder.mkdirs();
+			getLogger().info("Created LuaCraft directory at: " + luaCraftFolder.getAbsolutePath());
+		}	
+		
+		// Initialize Lua globals
 		globals = JsePlatform.standardGlobals();
 		globals.undumper = new Undumper(globals);
 		

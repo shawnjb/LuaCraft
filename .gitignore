@@ -1,36 +1,81 @@
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-/*.patch
+# Maven target directory
+/target/
 
-### IntelliJ IDEA ###
-/.idea
+# Logs
+*.log
+
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Maven wrapper files
+.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse specific files
+/.classpath
+/.project
+/.settings/
+/.target/
+
+# IDEA specific files
+/.idea/
+/*.iml
+/modules.xml
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/libraries/
+/.idea/shelf/
+/.idea/*-workspace.xml
+
+# VS Code specific files
+.vscode/
+
+# OS generated files #
+######################
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Eclipse files
+*.metadata
+*.classpath
+*.project
+*.settings/
+bin/
 
-### NetBeans ###
+# NetBeans specific
 /nbproject/private/
+/build/
 /nbbuild/
 /dist/
 /nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+/nbactions.xml
+/nb-configuration.xml
 
-### VS Code ###
-.vscode/
-
-### Mac OS ###
-.DS_Store
+# Miscellaneous
+*.swp
+*.lock
+*.tmp
+*.bak
+*.orig
+*.save

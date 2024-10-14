@@ -56,7 +56,7 @@ public class LuaCraftLibrary {
 		return null;
 	}
 
-	public void registerFunctions(Globals globals) {
+	public void registerLuaFunctions(Globals globals) {
 		LuaValue table = LuaValue.tableOf();
 
 		table.set("getPlayer", new VarArgFunction() {

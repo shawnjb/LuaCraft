@@ -11,6 +11,7 @@ import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
 import com.shawnjb.luacraft.lib.LuaCraftLibrary;
+import com.shawnjb.luacraft.lib.LuaCraftWorld;
 import com.shawnjb.luacraft.lib.ReadFile;
 import com.shawnjb.luacraft.lib.WriteFile;
 import com.shawnjb.luacraft.utils.Undumper;
@@ -49,6 +50,7 @@ public class LuaCraft extends JavaPlugin {
 		
 		// Initialize LuaCraftLibrary and register autorun scripts
 		LuaCraftLibrary luaCraftLibrary = new LuaCraftLibrary(this);
+		LuaCraftWorld luaCraftWorld = new LuaCraftWorld(this);
 		registerAutorunScripts(new File(getServer().getWorldContainer(), "lua"));
 		
 		// Register global file I/O functions
@@ -56,7 +58,8 @@ public class LuaCraft extends JavaPlugin {
 		ReadFile.registerGlobal(globals, this);
 		
 		// Register LuaCraft functions and Vec3 utility
-		luaCraftLibrary.registerFunctions(globals);
+		luaCraftLibrary.registerLuaFunctions(globals);
+		luaCraftWorld.registerLuaFunctions(globals);
 		Vec3Registrar.registerVec3(globals);
 		
 		// Register command handlers via LifecycleEventManager

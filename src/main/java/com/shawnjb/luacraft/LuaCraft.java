@@ -38,63 +38,60 @@ public class LuaCraft extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		File luaCraftFolder = new File(getDataFolder(), "lua");
+		File luaCraftFolder = getDataFolder();
 		if (!luaCraftFolder.exists()) {
 			luaCraftFolder.mkdirs();
 			getLogger().info("Created LuaCraft directory at: " + luaCraftFolder.getAbsolutePath());
-		}	
-		
+		}
+
 		// Initialize Lua globals
 		globals = JsePlatform.standardGlobals();
 		globals.undumper = new Undumper(globals);
-		
+
 		// Initialize LuaCraftLibrary and register autorun scripts
 		LuaCraftLibrary luaCraftLibrary = new LuaCraftLibrary(this);
 		LuaCraftWorld luaCraftWorld = new LuaCraftWorld(this);
 		registerAutorunScripts(new File(getServer().getWorldContainer(), "lua"));
-		
+
 		// Register global file I/O functions
 		WriteFile.registerGlobal(globals, this);
 		ReadFile.registerGlobal(globals, this);
-		
+
 		// Register LuaCraft functions and Vec3 utility
 		luaCraftLibrary.registerLuaFunctions(globals);
 		luaCraftWorld.registerLuaFunctions(globals);
 		Vec3Registrar.registerVec3(globals);
-		
+
 		// Register command handlers via LifecycleEventManager
 		LifecycleEventManager<Plugin> manager = this.getLifecycleManager();
 		manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
 			var commands = event.registrar();
-			
+
 			// Command: loadscript
 			commands.register(
-				Commands.literal("loadscript")
-					.then(Commands.argument("filename", StringArgumentType.word())
-						.suggests((context, builder) -> {
-							File luaDir = new File(getServer().getWorldContainer(), "lua");
-							if (luaDir.exists() && luaDir.isDirectory()) {
-								for (File file : luaDir.listFiles((dir, name) -> name.endsWith(".lua"))) {
-									String scriptName = file.getName().replace(".lua", "");
-									builder.suggest(scriptName);
-								}
-							}
-							return builder.buildFuture();
-						})
-						.executes(this::loadScript)
-					)
-					.build()
-			);
-			
+					Commands.literal("loadscript")
+							.then(Commands.argument("filename", StringArgumentType.word())
+									.suggests((context, builder) -> {
+										File luaDir = new File(getServer().getWorldContainer(), "lua");
+										if (luaDir.exists() && luaDir.isDirectory()) {
+											for (File file : luaDir.listFiles((dir, name) -> name.endsWith(".lua"))) {
+												String scriptName = file.getName().replace(".lua", "");
+												builder.suggest(scriptName);
+											}
+										}
+										return builder.buildFuture();
+									})
+									.executes(this::loadScript))
+							.build());
+
 			// Command: listscripts
 			commands.register(
-				Commands.literal("listscripts")
-					.executes(this::listScripts)
-					.build(),
-				"List all available Lua scripts"
-			);
+					Commands.literal("listscripts")
+							.executes(this::listScripts)
+							.build(),
+					"List all available Lua scripts");
 		});
-	}	
+	}
 
 	private int loadScript(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
 		CommandSourceStack sourceStack = context.getSource();

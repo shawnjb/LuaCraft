@@ -1,5 +1,3 @@
-local json = require('json')
-
 local function getPeopleInSpace()
     local response = LuaCraft.httpGet('http://api.open-notify.org/astros.json')
     if response ~= nil then

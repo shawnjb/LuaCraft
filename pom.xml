@@ -6,7 +6,7 @@
 
     <groupId>com.shawnjb</groupId>
     <artifactId>LuaCraft</artifactId>
-    <version>1.1.4-snapshot</version>
+    <version>1.1.4</version>
 
     <repositories>
         <repository>

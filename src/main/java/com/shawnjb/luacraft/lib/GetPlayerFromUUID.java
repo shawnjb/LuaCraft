@@ -8,9 +8,11 @@ import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 
 import com.shawnjb.luacraft.LuaCraft;
+import com.shawnjb.luacraft.LuaCraftPlayer;
 
 /**
- * The GetPlayerFromUUID class allows Lua scripts to find a player by their UUID.
+ * The GetPlayerFromUUID class allows Lua scripts to find a player by their UUID
+ * and return a LuaCraftPlayer object.
  */
 public class GetPlayerFromUUID extends VarArgFunction {
     private final LuaCraft plugin;
@@ -24,7 +26,7 @@ public class GetPlayerFromUUID extends VarArgFunction {
      * Lua Usage: getPlayerFromUUID(uuid)
      *
      * @param uuid the UUID of the player
-     * @return the player's name, or "Player not found" if the player is not online
+     * @return LuaCraftPlayer or "Player not found" if the player is not online
      */
     @Override
     public Varargs invoke(Varargs args) {
@@ -35,7 +37,8 @@ public class GetPlayerFromUUID extends VarArgFunction {
             Player player = Bukkit.getPlayer(uuid);
 
             if (player != null) {
-                return LuaValue.valueOf(player.getName());
+                LuaCraftPlayer luaCraftPlayer = new LuaCraftPlayer(player);
+                return luaCraftPlayer.toLuaValue();
             } else {
                 return LuaValue.valueOf("Player not found");
             }

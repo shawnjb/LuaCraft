@@ -29,6 +29,7 @@ public class LuaCraftLibrary {
 	
 		// LuaCraftPlayer methods
 		table.set("getPlayer", new GetPlayer());
+		table.set("getPlayers", new GetPlayers());
 		table.set("getPlayerFromUUID", new GetPlayerFromUUID(plugin));
 		table.set("getLocalPlayer", new GetLocalPlayer(plugin));
 		table.set("setPlayerWalkSpeed", new SetPlayerWalkSpeed(plugin));
@@ -61,7 +62,14 @@ public class LuaCraftLibrary {
 		table.set("readFile", new ReadFile(plugin));
 		table.set("writeFile", new WriteFile(plugin));
 		table.set("setClipboard", new SetClipboard(plugin));
+		table.set("convertAmpersandToSection", new ConvertAmpersandToSection());
+		table.set("broadcastMessage", new BroadcastMessage(plugin));
+
+		// Command execution
+		table.set("executeCommand", new ExecuteCommand(plugin));
+		table.set("executeCommandAs", new ExecuteCommandAs(plugin));
 
 		globals.set("LuaCraft", table);
+		globals.set("json", LuaCraftJSON.create());
 	}	
 }

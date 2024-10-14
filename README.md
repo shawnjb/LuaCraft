@@ -1,12 +1,13 @@
 # LuaCraft
 
-LuaCraft allows players to run Lua scripts in Minecraft.
+**LuaCraft** is a Minecraft plugin that integrates Lua scripting capabilities into [**Paper MC**](https://papermc.io), allowing players to create custom scripts for Minecraft efficiently.
 
 ## Commands
 
-- `/loadscript <filename>`: Loads and executes a specified Lua script from the `lua` directory.
-- `/listscripts`: Lists all available Lua scripts in the `lua` directory.
+- **`/loadscript <script name>`**: Load and execute a specified Lua script.
+  
+- **`/listscripts`**: List all available Lua scripts that can be loaded.
 
-## License
+## Documentation
 
-This project is licensed under the Apache License 2.0.
+The Lua directory is located in the server's root folder. The directory contains a `docs` folder with documentation for using LuaCraft. There’s enough information provided to help you get started with scripting and experimentation.

@@ -1,2 +1,2 @@
-LuaCraft.setPlayerSpeed(1)
-LuaCraft.setPlayerFlightSpeed(1)
+LuaCraft.setPlayerSpeed(2)
+LuaCraft.setPlayerFlightSpeed(2)

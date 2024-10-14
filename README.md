@@ -11,3 +11,6 @@
 ## Documentation
 
 The Lua directory is located in the server's root folder. The directory contains a `docs` folder with documentation for using LuaCraft. There’s enough information provided to help you get started with scripting and experimentation.
+
+> [!IMPORTANT]
+> To use features like autocompletion and diagnostics, you will need an environment that supports the Lua Language Server, such as Visual Studio Code with the appropriate extension, or a similar LSP-compatible editor. These tools help you write and manage your Lua scripts more efficiently.

@@ -79,3 +79,4 @@ bin/
 *.bak
 *.orig
 *.save
+dependency-reduced-pom.xml

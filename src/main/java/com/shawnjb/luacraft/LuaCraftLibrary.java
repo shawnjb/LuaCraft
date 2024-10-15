@@ -76,5 +76,8 @@ public class LuaCraftLibrary {
 
 		globals.set("LuaCraft", table);
 		globals.set("json", LuaCraftJSON.create());
+		
+		LuaCraftEventHandler eventHandler = new LuaCraftEventHandler(plugin);
+		globals.set("EventHandler", eventHandler.create());
 	}
 }

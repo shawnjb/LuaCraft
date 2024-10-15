@@ -8,6 +8,7 @@ import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 
 import com.shawnjb.luacraft.LuaCraft;
+import com.shawnjb.luacraft.LuaCraftPlayer;
 
 /**
  * The GetFurthestPlayer class allows Lua scripts to get the furthest player
@@ -30,8 +31,9 @@ public class GetFurthestPlayer extends VarArgFunction {
     @Override
     public Varargs invoke(Varargs args) {
         LuaValue playerValue = args.optvalue(1, LuaValue.NIL);
-        Player player = getPlayerFromLuaValue(playerValue);
-
+        Player player = LuaCraftPlayer.fromLuaValue(playerValue) != null
+                ? LuaCraftPlayer.fromLuaValue(playerValue).getPlayer()
+                : null;
         if (player == null) {
             player = getLocalPlayer();
             if (player == null) {
@@ -39,11 +41,9 @@ public class GetFurthestPlayer extends VarArgFunction {
                 return LuaValue.valueOf("Unavailable");
             }
         }
-
         Player furthestPlayer = null;
         double furthestDistance = 0;
         Location playerLocation = player.getLocation();
-
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (!onlinePlayer.equals(player)) {
                 double distance = playerLocation.distance(onlinePlayer.getLocation());
@@ -53,24 +53,12 @@ public class GetFurthestPlayer extends VarArgFunction {
                 }
             }
         }
-
         if (furthestPlayer != null) {
             return LuaValue.valueOf(furthestPlayer.getName());
         } else {
             return LuaValue.valueOf("No other players found.");
         }
     }
-
-    private Player getPlayerFromLuaValue(LuaValue value) {
-        if (value != null && value.istable()) {
-            LuaValue playerName = value.get("getName");
-            if (!playerName.isnil()) {
-                return plugin.getServer().getPlayer(playerName.tojstring());
-            }
-        }
-        return null;
-    }
-
     private Player getLocalPlayer() {
         if (plugin.getLastSender() instanceof Player) {
             return (Player) plugin.getLastSender();

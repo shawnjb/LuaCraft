@@ -8,6 +8,7 @@ import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 
 import com.shawnjb.luacraft.LuaCraft;
+import com.shawnjb.luacraft.LuaCraftPlayer;
 
 /**
  * The GetNearestPlayer class allows Lua scripts to get the nearest player
@@ -30,8 +31,9 @@ public class GetNearestPlayer extends VarArgFunction {
     @Override
     public Varargs invoke(Varargs args) {
         LuaValue playerValue = args.optvalue(1, LuaValue.NIL);
-        Player player = getPlayerFromLuaValue(playerValue);
-
+        Player player = LuaCraftPlayer.fromLuaValue(playerValue) != null
+                ? LuaCraftPlayer.fromLuaValue(playerValue).getPlayer()
+                : null;
         if (player == null) {
             player = getLocalPlayer();
             if (player == null) {
@@ -39,11 +41,9 @@ public class GetNearestPlayer extends VarArgFunction {
                 return LuaValue.valueOf("Unavailable");
             }
         }
-
         Player nearestPlayer = null;
         double nearestDistance = Double.MAX_VALUE;
         Location playerLocation = player.getLocation();
-
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (!onlinePlayer.equals(player)) {
                 double distance = playerLocation.distance(onlinePlayer.getLocation());
@@ -53,22 +53,11 @@ public class GetNearestPlayer extends VarArgFunction {
                 }
             }
         }
-
         if (nearestPlayer != null) {
             return LuaValue.valueOf(nearestPlayer.getName());
         } else {
             return LuaValue.valueOf("No other players nearby.");
         }
-    }
-
-    private Player getPlayerFromLuaValue(LuaValue value) {
-        if (value != null && value.istable()) {
-            LuaValue playerName = value.get("getName");
-            if (!playerName.isnil()) {
-                return plugin.getServer().getPlayer(playerName.tojstring());
-            }
-        }
-        return null;
     }
 
     private Player getLocalPlayer() {

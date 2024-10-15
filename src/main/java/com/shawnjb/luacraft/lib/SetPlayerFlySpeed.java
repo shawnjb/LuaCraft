@@ -6,6 +6,7 @@ import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 
 import com.shawnjb.luacraft.LuaCraft;
+import com.shawnjb.luacraft.LuaCraftPlayer;
 import com.shawnjb.luacraft.utils.TextFormatter;
 
 public class SetPlayerFlySpeed extends VarArgFunction {
@@ -27,7 +28,10 @@ public class SetPlayerFlySpeed extends VarArgFunction {
     public Varargs invoke(Varargs args) {
         LuaValue playerValue = args.optvalue(1, LuaValue.NIL);
         double speed = args.checkdouble(2);
-        Player player = getPlayerFromLuaValue(playerValue);
+
+        Player player = LuaCraftPlayer.fromLuaValue(playerValue) != null
+                ? LuaCraftPlayer.fromLuaValue(playerValue).getPlayer()
+                : null;
 
         if (player == null) {
             player = getLocalPlayer();
@@ -44,16 +48,6 @@ public class SetPlayerFlySpeed extends VarArgFunction {
 
         player.setFlySpeed((float) (speed / 10.0));
         return LuaValue.TRUE;
-    }
-
-    private Player getPlayerFromLuaValue(LuaValue value) {
-        if (value != null && value.istable()) {
-            LuaValue playerName = value.get("name");
-            if (!playerName.isnil()) {
-                return plugin.getServer().getPlayer(playerName.tojstring());
-            }
-        }
-        return null;
     }
 
     private Player getLocalPlayer() {

@@ -26,7 +26,7 @@ public class LuaCraftLibrary {
 
 	public void registerLuaFunctions(Globals globals) {
 		LuaValue table = LuaValue.tableOf();
-	
+
 		// LuaCraftPlayer methods
 		table.set("getPlayer", new GetPlayer());
 		table.set("getPlayers", new GetPlayers());
@@ -69,7 +69,12 @@ public class LuaCraftLibrary {
 		table.set("executeCommand", new ExecuteCommand(plugin));
 		table.set("executeCommandAs", new ExecuteCommandAs(plugin));
 
+		// Traversal methods
+		table.set("setDestinationPath", new SetDestinationPath());
+		table.set("stopAllPathRoutes", new StopAllPathRoutes());
+		table.set("getCurrentBiome", new StopAllPathRoutes());
+
 		globals.set("LuaCraft", table);
 		globals.set("json", LuaCraftJSON.create());
-	}	
+	}
 }

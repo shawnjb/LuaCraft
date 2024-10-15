@@ -9,6 +9,7 @@ import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 
 import com.shawnjb.luacraft.LuaCraft;
+import com.shawnjb.luacraft.LuaCraftPlayer;
 
 /**
  * The GetClosestEntity class allows Lua scripts to get the closest entity
@@ -32,7 +33,17 @@ public class GetClosestEntity extends VarArgFunction {
     @Override
     public Varargs invoke(Varargs args) {
         LuaValue playerValue = args.optvalue(1, LuaValue.NIL);
-        Player player = getPlayerFromLuaValue(playerValue);
+        Player player = LuaCraftPlayer.fromLuaValue(playerValue) != null
+                ? LuaCraftPlayer.fromLuaValue(playerValue).getPlayer()
+                : null;
+
+        if (player == null) {
+            player = getLocalPlayer();
+            if (player == null) {
+                plugin.getLogger().info("No player available.");
+                return LuaValue.valueOf("Unavailable");
+            }
+        }
 
         String entityTypeStr = args.optjstring(2, "ALL");
         EntityType entityTypeFilter = null;
@@ -46,14 +57,6 @@ public class GetClosestEntity extends VarArgFunction {
             }
         }
 
-        if (player == null) {
-            player = getLocalPlayer();
-            if (player == null) {
-                plugin.getLogger().info("No player available.");
-                return LuaValue.valueOf("Unavailable");
-            }
-        }
-
         Entity closestEntity = null;
         double closestDistance = Double.MAX_VALUE;
         Location playerLocation = player.getLocation();
@@ -62,33 +65,20 @@ public class GetClosestEntity extends VarArgFunction {
             if (entity.equals(player)) {
                 continue;
             }
-
             if (entityTypeFilter != null && entity.getType() != entityTypeFilter) {
                 continue;
             }
-
             double distance = playerLocation.distance(entity.getLocation());
             if (distance < closestDistance) {
                 closestDistance = distance;
                 closestEntity = entity;
             }
         }
-
         if (closestEntity != null) {
             return LuaValue.valueOf(closestEntity.getUniqueId().toString());
         } else {
             return LuaValue.valueOf("No entity found.");
         }
-    }
-
-    private Player getPlayerFromLuaValue(LuaValue value) {
-        if (value != null && value.istable()) {
-            LuaValue playerName = value.get("getName");
-            if (!playerName.isnil()) {
-                return plugin.getServer().getPlayer(playerName.tojstring());
-            }
-        }
-        return null;
     }
 
     private Player getLocalPlayer() {

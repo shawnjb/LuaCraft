@@ -9,6 +9,7 @@ import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 
 import com.shawnjb.luacraft.LuaCraft;
+import com.shawnjb.luacraft.LuaCraftPlayer;
 
 /**
  * The GetFurthestEntity class allows Lua scripts to get the furthest entity
@@ -32,11 +33,18 @@ public class GetFurthestEntity extends VarArgFunction {
     @Override
     public Varargs invoke(Varargs args) {
         LuaValue playerValue = args.optvalue(1, LuaValue.NIL);
-        Player player = getPlayerFromLuaValue(playerValue);
-
+        Player player = LuaCraftPlayer.fromLuaValue(playerValue) != null
+                ? LuaCraftPlayer.fromLuaValue(playerValue).getPlayer()
+                : null;
+        if (player == null) {
+            player = getLocalPlayer();
+            if (player == null) {
+                plugin.getLogger().info("No player available.");
+                return LuaValue.valueOf("Unavailable");
+            }
+        }
         String entityTypeStr = args.optjstring(2, "ALL");
         EntityType entityTypeFilter = null;
-
         if (!entityTypeStr.equalsIgnoreCase("ALL")) {
             try {
                 entityTypeFilter = EntityType.valueOf(entityTypeStr.toUpperCase());
@@ -45,50 +53,27 @@ public class GetFurthestEntity extends VarArgFunction {
                 return LuaValue.valueOf("Invalid entity type");
             }
         }
-
-        if (player == null) {
-            player = getLocalPlayer();
-            if (player == null) {
-                plugin.getLogger().info("No player available.");
-                return LuaValue.valueOf("Unavailable");
-            }
-        }
-
         Entity furthestEntity = null;
         double furthestDistance = 0;
         Location playerLocation = player.getLocation();
-
         for (Entity entity : player.getWorld().getEntities()) {
             if (entity.equals(player)) {
                 continue;
             }
-
             if (entityTypeFilter != null && entity.getType() != entityTypeFilter) {
                 continue;
             }
-
             double distance = playerLocation.distance(entity.getLocation());
             if (distance > furthestDistance) {
                 furthestDistance = distance;
                 furthestEntity = entity;
             }
         }
-
         if (furthestEntity != null) {
             return LuaValue.valueOf(furthestEntity.getUniqueId().toString());
         } else {
             return LuaValue.valueOf("No entity found.");
         }
-    }
-
-    private Player getPlayerFromLuaValue(LuaValue value) {
-        if (value != null && value.istable()) {
-            LuaValue playerName = value.get("getName");
-            if (!playerName.isnil()) {
-                return plugin.getServer().getPlayer(playerName.tojstring());
-            }
-        }
-        return null;
     }
 
     private Player getLocalPlayer() {

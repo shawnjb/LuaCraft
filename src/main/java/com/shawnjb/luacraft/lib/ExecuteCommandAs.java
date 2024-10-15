@@ -8,6 +8,7 @@ import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 
 import com.shawnjb.luacraft.LuaCraft;
+import com.shawnjb.luacraft.LuaCraftPlayer;
 
 /**
  * The ExecuteCommandAs class allows Lua scripts to execute a Minecraft command
@@ -32,33 +33,16 @@ public class ExecuteCommandAs extends VarArgFunction {
     public Varargs invoke(Varargs args) {
         LuaValue playerValue = args.optvalue(1, LuaValue.NIL);
         String command = args.checkjstring(2);
-
-        CommandSender sender;
-
-        Player player = getPlayerFromLuaValue(playerValue);
-        if (player != null) {
-            sender = player;
-        } else {
-            sender = Bukkit.getConsoleSender();
-        }
-
+        Player player = LuaCraftPlayer.fromLuaValue(playerValue) != null
+                ? LuaCraftPlayer.fromLuaValue(playerValue).getPlayer()
+                : null;
+        CommandSender sender = (player != null) ? player : Bukkit.getConsoleSender();
         boolean success = Bukkit.dispatchCommand(sender, command);
-
         if (success) {
             return LuaValue.TRUE;
         } else {
             plugin.getLogger().warning("Command failed: " + command);
             return LuaValue.FALSE;
         }
-    }
-
-    private Player getPlayerFromLuaValue(LuaValue value) {
-        if (value != null && value.istable()) {
-            LuaValue playerName = value.get("getName");
-            if (!playerName.isnil()) {
-                return plugin.getServer().getPlayer(playerName.tojstring());
-            }
-        }
-        return null;
     }
 }

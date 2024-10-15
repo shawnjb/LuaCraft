@@ -21,6 +21,7 @@ Please provide a concise description of the bug, including any relevant details 
 _Which version of LuaCraft are you using?_
 
 **Environment:**
+
 - **Minecraft Version:**  
   _Provide the version of Minecraft you're running LuaCraft on._
   

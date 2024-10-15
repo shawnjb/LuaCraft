@@ -131,15 +131,23 @@ function LuaCraft.getFurthestEntity(player, entityType) end
 
 -- LuaCraftItem methods
 
---- Creates a new item and gives it to the player.
---- @param player LuaCraftPlayer? The player to give the item to.
---- @param itemName string The name of the item.
---- @param amount number The quantity of the item.
---- @return boolean @`true` if the item was given successfully.
+--- Creates a new item with custom attributes and gives it to the specified player.
+--- 
+--- @param materialName string The name of the material (e.g., "DIAMOND_SWORD").
+--- @param itemData LuaCraftItemData A table containing the custom attributes for the item.
+--- @return LuaCraftItem The newly created item if successful, or nil if creation failed.
+--- 
+--- Example usage:
 --- ```lua
---- LuaCraft.newItem(player, "DIAMOND", 5)
+--- local player = LuaCraft.getLocalPlayer()
+--- LuaCraftWorld.NewItem("DIAMOND_SWORD", {
+---     player = player,
+---     name = "&6Legendary Sword",
+---     lore = { "Forged in the fires of the nether", "Unbreakable" },
+---     enchantments = { { "sharpness", 5 }, { "unbreaking", 3 } }
+--- })
 --- ```
-function LuaCraft.newItem(player, itemName, amount) end
+function LuaCraft.newItem(materialName, itemData) end
 
 --- Gets the player's inventory.
 --- @param player LuaCraftPlayer? The player whose inventory to get.

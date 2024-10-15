@@ -87,13 +87,10 @@ function LuaCraft.getFurthestPlayer(player) end
 
 -- LuaCraftEntity methods
 
---- Spawns a new entity in the world.
---- @param entityType string The type of the entity to spawn (e.g., "ZOMBIE").
---- @param position table The position where the entity should be spawned (e.g., `{x=100, y=64, z=100}`).
---- @return LuaCraftEntity @The newly spawned entity.
---- ```lua
---- local entity = LuaCraft.newEntity("ZOMBIE", {x=100, y=64, z=100})
---- ```
+--- Spawns a new entity at the specified position.
+--- @param entityType string The type of the entity to spawn (e.g., "ZOMBIE", "CREEPER").
+--- @param position Vec3 A Vec3 table representing the position where the entity should be spawned.
+--- @return LuaCraftEntity @The newly spawned entity as a LuaCraftEntity object, or nil if spawning failed.
 function LuaCraft.newEntity(entityType, position) end
 
 --- Gets all entities in the player's world.
@@ -135,7 +132,7 @@ function LuaCraft.getFurthestEntity(player, entityType) end
 --- 
 --- @param materialName string The name of the material (e.g., "DIAMOND_SWORD").
 --- @param itemData LuaCraftItemData A table containing the custom attributes for the item.
---- @return LuaCraftItem The newly created item if successful, or nil if creation failed.
+--- @return LuaCraftItem @The newly created item if successful, or nil if creation failed.
 --- 
 --- Example usage:
 --- ```lua
@@ -151,7 +148,7 @@ function LuaCraft.newItem(materialName, itemData) end
 
 --- Gets the player's inventory.
 --- @param player LuaCraftPlayer? The player whose inventory to get.
---- @return table @A list of items in the player's inventory.
+--- @return { [number]: LuaCraftItem } @A list of items in the player's inventory.
 --- ```lua
 --- local inventory = LuaCraft.getInventory(player)
 --- ```

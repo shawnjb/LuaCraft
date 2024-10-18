@@ -1,5 +1,5 @@
 name: LuaCraft
-version: 1.2.0-rc.1
+version: 1.2.0-rc.2
 api-version: 1.21
 main: com.shawnjb.luacraft.LuaCraft
 
@@ -14,6 +14,11 @@ commands:
     usage: "/listscripts"
     permission: "luacraft.listscripts"
     permission-message: "You do not have permission to list Lua scripts."
+  loadstring:
+    description: "Load and execute Lua code from a string"
+    usage: "/loadstring <lua_code>"
+    permission: "luacraft.loadstring"
+    permission-message: "You do not have permission to execute Lua code from a string."
 
 permissions:
   luacraft.loadscript:
@@ -21,4 +26,7 @@ permissions:
     default: op
   luacraft.listscripts:
     description: Allows viewing of available Lua scripts
+    default: op
+  luacraft.loadstring:
+    description: Allows execution of Lua code provided as a string
     default: op

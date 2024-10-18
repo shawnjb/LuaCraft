@@ -80,3 +80,4 @@ bin/
 *.orig
 *.save
 dependency-reduced-pom.xml
+/*.bat

@@ -81,6 +81,14 @@ public class LuaCraft extends JavaPlugin {
 							.executes(this::listScripts)
 							.build(),
 					"List all available Lua scripts");
+
+			// Command: loadstring
+			commands.register(
+						Commands.literal("loadstring")
+							.then(Commands.argument("code", StringArgumentType.greedyString())
+								.executes(this::loadString))
+							.build()
+					);
 		});
 	}
 
@@ -147,6 +155,27 @@ public class LuaCraft extends JavaPlugin {
 		sender.sendMessage(prefix.append(scriptsList));
 		return 1;
 	}
+
+	private int loadString(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+		CommandSourceStack sourceStack = context.getSource();
+		CommandSender sender = sourceStack.getSender();
+		lastSender = sender;
+		String code = StringArgumentType.getString(context, "code");
+	
+		Component prefix = Component.text("[LuaCraft] ").color(NamedTextColor.LIGHT_PURPLE);
+	
+		try {
+			LuaValue chunk = globals.load(code);
+			chunk.call();
+			lastSender.sendMessage(
+					prefix.append(Component.text("Code executed successfully").color(NamedTextColor.GREEN)));
+		} catch (LuaError e) {
+			lastSender.sendMessage(
+					prefix.append(Component.text("Error executing code: " + e.getMessage()).color(NamedTextColor.RED)));
+		}
+		
+		return 1;
+	}	
 
 	private void registerAutorunScripts(File luaDir) {
 		copyResourceDirectoryToServer("lua", luaDir);
